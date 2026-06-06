@@ -627,65 +627,120 @@ const STEPS = [
     id:'1-G', section:'준비', title:'Dooray MCP 설치',
     preview() {
       return termMock([
-        {type:'prompt',text:'$ '},
+        {type:'comment',text:'# 1) 소스 다운로드'},
         {type:'cmd',text:'git clone https://github.com/ariri48/dooray-mcp.git'},
-        {type:'output',text:'Cloning into \'dooray-mcp\'...'},
-        {type:'success',text:'done.'},
-        {type:'prompt',text:'$ '},
-        {type:'cmd',text:'cd dooray-mcp && python setup.py'},
+        {type:'cmd',text:'cd dooray-mcp'},
+        {type:'comment',text:'# 2) 설치 마법사 (토큰 입력 -> 자동 연결)'},
+        {type:'cmd',text:'python setup.py'},
         {type:'output',text:'Dooray API Token: ********'},
-        {type:'success',text:'✓ MCP 설정 완료'}
+        {type:'success',text:'✓ .env 저장 / 의존성 / 연결 검증'},
+        {type:'success',text:'✓ Claude Code에 MCP 등록 완료'},
+        {type:'comment',text:'# 3) Claude Code 안에서 확인'},
+        {type:'cmd',text:'/mcp'},
+        {type:'success',text:'● dooray-mcp   connected'}
       ]);
     },
     content() {
       return `
         <div class="step-label">1-G &middot; Dooray MCP 설치</div>
-        <div class="tip-box">💡 <strong>MCP가 뭔가요?</strong> — Claude Code에 <strong>외부 서비스를 연결하는 플러그인</strong>입니다. 이걸 설치하면 Claude Code에서 <strong>Dooray 태스크를 조회/생성/수정</strong>할 수 있게 됩니다.</div>
+        <div class="tip-box">💡 <strong>이게 뭐예요? 어디에 써요?</strong> — MCP는 Claude Code에 <strong>"두레이 열쇠"를 쥐여주는 플러그인</strong>이에요. 설치하면 두레이 사이트를 직접 열지 않고도 <strong>"내 태스크 보여줘", "그 태스크에 댓글 달아줘"</strong>처럼 한국어로 부탁만 하면 Claude가 두레이 일을 대신 해줍니다.</div>
 
-        <p class="step-desc"><strong>Step 1. 소스 코드 다운로드</strong></p>
-        <p class="step-desc">아래 명령어를 <strong>일반 터미널</strong>(Claude Code 밖)에서 실행합니다.</p>
-        ${codeBlock('git clone https://github.com/ariri48/dooray-mcp.git\ncd dooray-mcp','bash')}
-
-        <p class="step-desc" style="margin-top:16px;"><strong>Step 2. Dooray API 토큰 발급</strong></p>
+        <p class="step-desc"><strong>🧰 시작 전 준비물 3가지</strong></p>
         <div style="display:flex;flex-direction:column;gap:6px;margin:8px 0;">
-          <div class="result-box success"><span class="result-icon">1️⃣</span> Dooray 접속 → 우측 상단 <strong>내 프로필 아이콘</strong> 클릭</div>
-          <div class="result-box success"><span class="result-icon">2️⃣</span> <strong>설정</strong> → 좌측 메뉴에서 <strong>"API 토큰"</strong> 클릭</div>
-          <div class="result-box success"><span class="result-icon">3️⃣</span> <strong>"새 토큰 발급"</strong> 버튼 클릭 → 토큰 이름 입력 (예: "Claude Code")</div>
-          <div class="result-box success"><span class="result-icon">4️⃣</span> 생성된 토큰 문자열을 <strong>복사</strong> (이 화면을 닫으면 다시 볼 수 없으니 꼭 복사!)</div>
+          <div class="result-box success"><span class="result-icon">✅</span> <strong>Python 3.10 이상</strong> (앞의 1-F 단계에서 설치했어요)</div>
+          <div class="result-box success"><span class="result-icon">✅</span> <strong>Claude Code</strong> 설치 완료</div>
+          <div class="result-box success"><span class="result-icon">✅</span> <strong>두레이 로그인</strong> 가능 + 토큰 붙여둘 <strong>메모장</strong> 하나 열어두기</div>
         </div>
+        <div class="tip-box">⏱️ 천천히 해도 <strong>10분</strong>이면 끝납니다. 막히면 손 드세요!</div>
 
-        <p class="step-desc" style="margin-top:16px;"><strong>Step 3. setup.py 실행</strong></p>
-        <p class="step-desc">아래 명령어를 실행하면 토큰을 입력하라는 안내가 나옵니다. 복사한 토큰을 붙여넣기(Ctrl+V)하세요.</p>
+        <p class="step-desc" style="margin-top:16px;"><strong>Step 1. 소스 코드 다운로드</strong></p>
+        <p class="step-desc">아래 두 줄을 <strong>일반 터미널</strong>(Claude Code 밖, 윈도우 PowerShell / 맥 터미널)에 붙여넣고 실행하세요.</p>
+        ${codeBlock('git clone https://github.com/ariri48/dooray-mcp.git\ncd dooray-mcp','bash')}
+        ${successBox('"dooray-mcp" 폴더가 생기고 그 안으로 이동되면 성공')}
+
+        <p class="step-desc" style="margin-top:16px;"><strong>Step 2. 두레이 API 토큰 발급 (= 내 비밀 열쇠)</strong></p>
+        <p class="step-desc"><strong>토큰</strong>이란? Claude가 "이 사람이 진짜 본인 맞아요"라고 두레이에 보여주는 <strong>긴 비밀번호 한 줄</strong>이에요. 이게 있으면 매번 로그인할 필요가 없어요.</p>
+        <div style="display:flex;flex-direction:column;gap:6px;margin:8px 0;">
+          <div class="result-box success"><span class="result-icon">1️⃣</span> 브라우저에서 두레이 접속 → 우측 상단 <strong>내 프로필 아이콘</strong> 클릭</div>
+          <div class="result-box success"><span class="result-icon">2️⃣</span> <strong>설정</strong> → 좌측 메뉴에서 <strong>"API 토큰"</strong> 클릭</div>
+          <div class="result-box success"><span class="result-icon">3️⃣</span> <strong>"새 토큰 발급"</strong> 클릭 → 이름 입력 (예: Claude Code)</div>
+          <div class="result-box success"><span class="result-icon">4️⃣</span> 생성된 토큰을 <strong>메모장에 복사</strong> (이 화면을 닫으면 다시 못 봐요!)</div>
+        </div>
+        ${codeBlock('토큰은 [조직코드:토큰문자열] 형태예요 (가운데 콜론 포함, 통째로 복사)\n예) ajjt1imxmtj4:tyFuu5obTEGSO3sh5cxgow','text')}
+        <div class="tip-box">🔒 이 토큰은 <strong>비밀번호와 똑같습니다.</strong> 메신저·메일·캡처로 남에게 보내지 마세요. 새어나갔다면 위 화면에서 그 토큰을 삭제하고 새로 만들면 됩니다.</div>
+
+        <p class="step-desc" style="margin-top:16px;"><strong>Step 3. 설치 마법사 실행 — 여기서 토큰과 MCP가 "연결"됩니다 ⭐</strong></p>
+        <p class="step-desc">같은 터미널에서 아래를 실행하세요. 토큰을 물어보면 <strong>메모장 토큰을 붙여넣고(Ctrl+V) Enter</strong>, "테넌트 ID"는 <strong>그냥 Enter</strong>(기본값 사용)를 누르면 됩니다.</p>
         ${codeBlock('python setup.py','bash')}
         <div style="background:#0f172a;border-radius:10px;padding:14px;margin:8px 0;font-size:12px;font-family:monospace;color:#e2e8f0;line-height:1.7;">
-          <span style="color:#22d3ee;">Dooray API Token:</span> <span style="color:#fbbf24;">여기에 복사한 토큰 붙여넣기 → Enter</span><br>
+          <span style="color:#22d3ee;">Dooray API Token:</span> <span style="color:#fbbf24;">메모장 토큰 붙여넣기 → Enter</span><br>
+          <span style="color:#22d3ee;">테넌트 ID (기본: 1387695619080878080):</span> <span style="color:#fbbf24;">그냥 Enter</span><br>
           <span style="color:#4ade80;">✓ .env 파일에 토큰 저장 완료</span><br>
-          <span style="color:#4ade80;">✓ MCP 설정 완료</span>
+          <span style="color:#4ade80;">✓ 의존성 설치 / API 연결 검증 완료</span><br>
+          <span style="color:#4ade80;">✓ Claude Code에 MCP 등록 완료</span>
         </div>
-        ${successBox('MCP 설정 완료 메시지 나오면 성공')}
+        <p class="step-desc">마법사가 <strong>한 번에 자동으로</strong> 처리해 주는 것:</p>
+        <div style="display:flex;flex-direction:column;gap:6px;margin:8px 0;">
+          <div class="result-box success"><span class="result-icon">①</span> 토큰을 <strong>.env 파일</strong>에 안전하게 저장</div>
+          <div class="result-box success"><span class="result-icon">②</span> 필요한 <strong>부품(의존성)</strong> 설치 + 두레이 <strong>연결 확인</strong></div>
+          <div class="result-box success"><span class="result-icon">③</span> 내 두레이 <strong>프로젝트 자동 탐색</strong></div>
+          <div class="result-box success"><span class="result-icon">④</span> <strong>Claude Code에 MCP 등록</strong> (이게 토큰↔Claude 연결 고리!)</div>
+        </div>
+        ${successBox('"Claude Code에 MCP 등록 완료" 메시지가 나오면 성공')}
 
-        <p class="step-desc" style="margin-top:20px;"><strong>📁 .env 파일이란?</strong></p>
+        <p class="step-desc" style="margin-top:16px;"><strong>Step 4. Claude Code 재시작</strong></p>
+        <p class="step-desc">Claude Code가 이미 켜져 있었다면 <strong>완전히 껐다가 새로 켜세요.</strong> 안 그러면 방금 만든 연결이 반영되지 않아요.</p>
+
+        <p class="step-desc" style="margin-top:16px;"><strong>Step 5. 연결 확인 — /mcp 로 두 눈으로 확인하기 ✅</strong></p>
+        <p class="step-desc"><strong>① 터미널에서</strong> (등록됐는지):</p>
+        ${codeBlock('claude mcp list','bash')}
+        <p class="step-desc">→ 목록에 <strong>dooray-mcp</strong> 가 보이면 "등록"은 OK.</p>
+        <p class="step-desc"><strong>② Claude Code <em>안에서</em></strong> — 이게 진짜 "연결됐는지" 확인입니다. OS 터미널 말고, <strong>Claude와 대화하는 입력칸</strong>에 이렇게 칩니다:</p>
+        ${codeBlock('/mcp','text')}
+        <div style="display:flex;flex-direction:column;gap:6px;margin:8px 0;">
+          <div class="result-box success"><span class="result-icon">🟢</span> <strong>connected</strong> + 도구 개수가 보임 → <strong>연결 성공! 🎉</strong></div>
+          <div class="result-box success"><span class="result-icon">🟡</span> <strong>connecting / pending</strong> → 아직 연결 중. 잠깐 뒤 다시 <strong>/mcp</strong></div>
+          <div class="result-box fail"><span class="result-icon">🔴</span> <strong>failed</strong> (도구 0개) → 토큰/경로 문제. 아래 "혼자 고치기"를 보세요</div>
+        </div>
+        ${successBox('/mcp 에서 dooray-mcp 가 connected 면 전부 성공!')}
+
+        <p class="step-desc" style="margin-top:16px;"><strong>Step 6. 진짜 일 시켜보기</strong></p>
+        <p class="step-desc">Claude Code 입력칸에 적어보세요:</p>
+        ${codeBlock('내 두레이 태스크 보여줘','text')}
+        <p class="step-desc">처음엔 Claude가 <em>"dooray 도구를 써도 될까요?"</em>라고 물어볼 수 있어요. <strong>「허용(Allow)」</strong>을 누르면 됩니다. 내 업무 목록이 나오면 끝! 🎉</p>
+
+        <p class="step-desc" style="margin-top:20px;"><strong>📁 .env 파일이란? (토큰↔MCP 연결 고리)</strong></p>
         <div style="margin:8px 0;padding:14px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;">
-          <p class="step-desc" style="margin:0;"><strong>.env</strong> 파일은 <strong>비밀 정보를 저장하는 메모장</strong>입니다.</p>
+          <p class="step-desc" style="margin:0;"><strong>.env</strong> 파일은 <strong>비밀 정보를 저장하는 메모장</strong>이에요. MCP는 켜질 때 이 파일에서 토큰을 꺼내 두레이에 접속합니다.</p>
           <table class="compact-table" style="margin-top:10px;">
             <tr><th>궁금증</th><th>답변</th></tr>
-            <tr><td><strong>왜 필요한가요?</strong></td><td>API 토큰(비밀번호 같은 것)을 코드에 직접 적으면 다른 사람에게 노출될 위험이 있습니다. <strong>.env 파일에 따로 보관</strong>하면 안전합니다.</td></tr>
-            <tr><td><strong>어디에 있나요?</strong></td><td>dooray-mcp 폴더 안에 <strong>.env</strong> 파일이 자동 생성됩니다. 파일 이름 앞에 점(.)이 있어서 <strong>숨김 파일</strong>로 보일 수 있습니다.</td></tr>
-            <tr><td><strong>안에 뭐가 들어있나요?</strong></td><td>아래처럼 <strong>키=값</strong> 형태로 비밀 정보가 저장됩니다.</td></tr>
+            <tr><td><strong>왜 필요한가요?</strong></td><td>API 토큰(비밀번호 같은 것)을 코드에 직접 적으면 노출 위험이 있어요. <strong>.env 파일에 따로 보관</strong>하면 안전합니다.</td></tr>
+            <tr><td><strong>어디에 있나요?</strong></td><td><strong>dooray-mcp 폴더 안</strong>에 자동 생성됩니다. 이름 앞에 점(.)이 있어 <strong>숨김 파일</strong>로 보일 수 있어요.</td></tr>
+            <tr><td><strong>직접 만들어야 하나요?</strong></td><td>아니요. <strong>setup.py가 자동으로</strong> 만들어줍니다. 직접 편집할 필요 없어요.</td></tr>
           </table>
-          ${codeBlock('DOORAY_API_TOKEN=여기에_발급받은_토큰_값\nDOORAY_TENANT_ID=1387695619080878080','text')}
-          <div class="tip-box" style="margin-top:8px;">💡 <strong>.env 파일은 절대 다른 사람에게 공유하지 마세요.</strong> 비밀번호가 들어있는 파일입니다. setup.py가 자동으로 만들어주니 직접 편집할 필요는 없습니다.</div>
+          ${codeBlock('DOORAY_API_TOKEN=조직코드:토큰문자열\nDOORAY_TENANT_ID=1387695619080878080','text')}
+          <div class="tip-box" style="margin-top:8px;">💡 <strong>.env 파일은 절대 다른 사람에게 공유하지 마세요.</strong> 비밀번호가 들어있는 파일입니다.</div>
         </div>
 
-        <p class="step-desc" style="margin-top:16px;"><strong>수동으로 .env 파일을 만들거나 수정하려면?</strong></p>
-        <p class="step-desc">setup.py 없이 직접 .env 파일을 만들 수도 있습니다.</p>
-        <div style="display:flex;flex-direction:column;gap:6px;margin:8px 0;">
-          <div class="result-box success"><span class="result-icon">1️⃣</span> dooray-mcp 폴더에서 메모장을 엽니다</div>
-          <div class="result-box success"><span class="result-icon">2️⃣</span> 아래 내용을 입력합니다 (토큰 값을 본인 것으로 교체)</div>
-          <div class="result-box success"><span class="result-icon">3️⃣</span> <strong>파일 → 다른 이름으로 저장</strong> → 파일명을 <strong>.env</strong>로 저장 (파일 형식: "모든 파일")</div>
-        </div>
-        ${codeBlock('DOORAY_API_TOKEN=발급받은_토큰을_여기에_붙여넣기\nDOORAY_TENANT_ID=1387695619080878080','text')}
-        <div class="tip-box">💡 <strong>파일명 주의:</strong> 반드시 <strong>.env</strong>입니다. env.txt가 아닙니다! 저장할 때 파일 형식을 "모든 파일(*.*)"로 바꿔야 확장자가 .txt로 붙지 않습니다.</div>
+        <p class="step-desc" style="margin-top:16px;"><strong>🛠️ 마법사(setup.py)가 안 될 때 — 수동 설치</strong></p>
+        <p class="step-desc">아래를 차례로 실행하면 손으로도 설치/등록할 수 있어요. 마지막 줄의 경로는 <strong>내 dooray-mcp 폴더의 run_server.py 전체 경로</strong>로 바꾸세요.</p>
+        ${codeBlock('pip install mcp[cli] requests python-dotenv\ncp .env.example .env\n# .env 파일을 열어 DOORAY_API_TOKEN= 뒤에 내 토큰 입력 후 저장\nclaude mcp add dooray-mcp -s user -- python /내-경로/dooray-mcp/run_server.py','bash')}
+        <div class="tip-box">💡 경로가 헷갈리면, dooray-mcp 폴더 안에서 터미널을 열고 <strong>pwd</strong>(맥) / <strong>cd</strong>(윈도우, 단독 입력)를 치면 현재 폴더 경로가 나와요. 거기에 <strong>/run_server.py</strong>를 붙이면 됩니다.</div>
+
+        <p class="step-desc" style="margin-top:20px;"><strong>💪 컴퓨터를 바꿨거나 갑자기 안 될 때 — 혼자 고치기</strong></p>
+        <div class="tip-box">기억할 2가지: <strong>① 토큰은 한 번 받으면 계속 써요</strong>(두레이 웹에서 로그아웃돼도 토큰은 살아 있음). <strong>② dooray-mcp 폴더와 등록은 "그 컴퓨터에만" 저장</strong>됩니다. 그래서 컴퓨터를 바꾸면 Step 1~4를 다시 하면 돼요.</div>
+        <table class="compact-table">
+          <tr><th>이런 상황이면</th><th>이렇게 하세요</th></tr>
+          <tr><td>💻 <strong>새 컴퓨터/노트북</strong>으로 바꿨다</td><td>메모장의 토큰으로 <strong>Step 1~4 다시</strong> (git clone → python setup.py). 토큰 재발급 불필요</td></tr>
+          <tr><td>🔓 두레이 웹에서 <strong>로그아웃됐다</strong></td><td>걱정 마세요. 토큰은 그대로 동작합니다</td></tr>
+          <tr><td>🔴 /mcp에서 <strong>failed</strong> / "인증 실패·401"</td><td>토큰이 틀렸거나 만료. 토큰 재발급(Step 2) 후 <strong>python setup.py</strong> 다시</td></tr>
+          <tr><td>🤔 분명 설치했는데 두레이가 안 된다</td><td>Claude Code <strong>완전 종료 후 재실행</strong> → 다시 <strong>/mcp</strong></td></tr>
+          <tr><td>📁 dooray-mcp <strong>폴더를 옮겼다/지웠다</strong></td><td>등록된 경로가 깨진 것. 폴더 되돌리거나, 아래 "재설치"로 다시 등록</td></tr>
+          <tr><td>😵 메모장 토큰을 잃어버렸다</td><td>Step 2에서 <strong>새 토큰 발급</strong> 후 python setup.py</td></tr>
+        </table>
+        <p class="step-desc" style="margin-top:10px;"><strong>그래도 안 되면 — 깨끗하게 재설치:</strong> 기존 등록을 지우고 마법사를 다시 돌립니다.</p>
+        ${codeBlock('claude mcp remove dooray-mcp -s user\ncd /내-경로/dooray-mcp\npython setup.py','bash')}
+        <div class="tip-box">💡 메모장에 적어둔 토큰은 컴퓨터를 바꿔도 재사용하는 "재산"입니다. 비밀번호 관리 앱 등 안전한 곳에 보관해두면 다음에 5분이면 복구돼요.</div>
       `;
     }
   },
