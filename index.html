@@ -720,6 +720,17 @@ const STEPS = [
 
         <p class="step-desc" style="margin-top:16px;"><strong>Step 3. 설치 마법사 실행 — 여기서 토큰과 MCP가 "연결"됩니다 ⭐</strong></p>
         <p class="step-desc">같은 터미널에서 아래를 실행하세요. 토큰을 물어보면 <strong>메모장 토큰을 붙여넣고(Ctrl+V) Enter</strong>, "테넌트 ID"는 <strong>그냥 Enter</strong>(기본값 사용)를 누르면 됩니다.</p>
+        <div class="tip-box" style="background:#fffbeb;border-color:#fcd34d;">
+          ⌨️ <strong>어디서 실행하나요? — Claude Code 대화창이 아니라 "일반 터미널"입니다.</strong> (맥: 터미널 앱 / 윈도우: PowerShell·명령 프롬프트). Step 1에서 <code>git clone</code> 한 그 창 그대로 쓰면 돼요.
+          <div style="margin-top:10px;display:flex;flex-direction:column;gap:5px;">
+            <div>1️⃣ <strong>터미널 열기</strong> (Claude Code 대화창 ❌)</div>
+            <div>2️⃣ <strong>dooray-mcp 폴더로 이동</strong> → <code>cd dooray-mcp</code> (Step 1에서 이미 들어갔다면 그대로 OK)</div>
+            <div>3️⃣ <code>python setup.py</code> &nbsp;← 여기!</div>
+            <div>4️⃣ <strong>"Dooray API Token:"</strong> 뜨면 복사한 토큰 붙여넣기(Ctrl+V) → Enter</div>
+            <div>5️⃣ <strong>✓ 완료 메시지들</strong> 확인</div>
+          </div>
+          <div style="margin-top:10px;font-size:12px;color:#92400e;">💡 <strong>dooray-mcp 폴더는 자동 생성이 아니에요.</strong> Step 1의 <code>git clone</code>이 폴더를 만들고, <code>cd</code>로 들어간 뒤 그 안에서 <code>setup.py</code>를 돌립니다.</div>
+        </div>
         ${codeBlock('python setup.py','bash')}
         <div style="background:#0f172a;border-radius:10px;padding:14px;margin:8px 0;font-size:12px;font-family:monospace;color:#e2e8f0;line-height:1.7;">
           <span style="color:#22d3ee;">Dooray API Token:</span> <span style="color:#fbbf24;">메모장 토큰 붙여넣기 → Enter</span><br>
