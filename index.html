@@ -514,6 +514,55 @@ const STEPS = [
     }
   },
   {
+    id:'1-D2', section:'준비', title:'작업 폴더 만들기',
+    preview() {
+      return `<div style="width:100%;background:#0f172a;border-radius:10px;padding:16px;font-family:monospace;font-size:12px;color:#e2e8f0;line-height:1.9;">
+        <div style="color:#94a3b8;margin-bottom:6px;"># 추천 폴더 구조</div>
+        📁 내문서<br>
+        &nbsp;└─ 📁 ai-작업 <span style="color:#fbbf24;">← 여기서 Claude 켜기</span><br>
+        &nbsp;&nbsp;&nbsp;&nbsp;├─ 📁 보고서<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;├─ 📁 자료조사<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;├─ 📁 매출분석<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;└─ 📁 연습장 <span style="color:#94a3b8;">(실험용)</span>
+      </div>`;
+    },
+    content() {
+      return `
+        <div class="step-label">1-D2 &middot; 작업 폴더 만들기</div>
+        <div class="tip-box">💡 <strong>AI를 본격적으로 쓰기 전에!</strong> — Claude Code는 <strong>"켠 폴더"와 그 안쪽만 볼 수 있어요.</strong> 그 폴더가 곧 Claude의 작업실입니다. 그래서 폴더를 어떻게 두고 켜느냐가 처음부터 중요해요.</div>
+
+        <p class="step-desc"><strong>❌ 하지 말 것</strong></p>
+        <p class="step-desc">바탕화면 전체나 C드라이브 최상위·홈 폴더처럼 <strong>너무 넓은 곳에서 켜지 마세요.</strong> Claude가 수많은 파일을 보게 되어 헷갈리고 실수 위험도 커집니다.</p>
+
+        <p class="step-desc" style="margin-top:16px;"><strong>✅ 권장: AI 전용 폴더 하나 + 일거리별 하위 폴더</strong></p>
+        <p class="step-desc">내 문서 안에 <strong>ai-작업</strong> 같은 폴더를 하나 만들고, 그 안에 <strong>일거리별 하위 폴더</strong>를 두세요. (왼쪽 그림 참고)</p>
+        <div style="display:flex;flex-direction:column;gap:6px;margin:8px 0;">
+          <div class="result-box success"><span class="result-icon">①</span> 일(프로젝트) <strong>하나당 폴더 하나</strong></div>
+          <div class="result-box success"><span class="result-icon">②</span> 관련 파일은 <strong>그 폴더 안에 모아두기</strong></div>
+          <div class="result-box success"><span class="result-icon">③</span> Claude Code는 항상 <strong>"그 일의 폴더"에서 켜기</strong></div>
+        </div>
+
+        <p class="step-desc" style="margin-top:16px;"><strong>그래서 어떻게 "그 폴더에서" 켜나요?</strong></p>
+        <p class="step-desc">그 폴더 위치에서 터미널을 연 다음 <strong>claude</strong> 를 실행하면 됩니다.</p>
+        <p class="step-desc"><strong>🍎 Mac:</strong> Finder에서 폴더 우클릭 → "폴더에서 새로운 터미널 열기". 또는 터미널에서:</p>
+        ${codeBlock('cd ~/Documents/ai-작업/보고서\nclaude','bash')}
+        <p class="step-desc"><strong>🪟 Windows:</strong> 폴더 안에서 주소창에 cmd 입력 후 Enter. 또는 PowerShell에서:</p>
+        ${codeBlock('cd $HOME\\Documents\\ai-작업\\보고서\nclaude','bash')}
+        <div class="tip-box">💡 지금 어느 폴더에 있는지 보려면 — Mac: <strong>pwd</strong> / Windows: <strong>cd</strong>(단독 입력) → 현재 폴더 경로가 나와요.</div>
+        ${successBox('원하는 폴더에서 claude 가 실행되면 완료')}
+
+        <p class="step-desc" style="margin-top:16px;"><strong>🔗 두레이(1-G)와의 관계</strong></p>
+        <div class="tip-box">두레이 MCP는 한 번 설치하면 <strong>어느 폴더에서 켜도 동작</strong>해요(설치할 때 절대경로로 등록되니까요). 그러니 작업 폴더는 <strong>"내 파일을 일거리별로 정리"</strong>하는 용도로 쓰면 됩니다. 단, 중요한 자료가 든 폴더에서 켤 때 Claude가 파일을 바꾸기 전 <strong>매번 허용/거부를 물어보니</strong> 잘 보고 누르세요.</div>
+
+        <p class="step-desc" style="margin-top:16px;"><strong>폴더 이름 팁</strong></p>
+        <div style="display:flex;flex-direction:column;gap:6px;margin:8px 0;">
+          <div class="result-box success"><span class="result-icon">💡</span> 한글도 되지만 <strong>영문·숫자·하이픈(-)</strong>이 터미널에서 편해요 (예: reports, dooray-work)</div>
+          <div class="result-box success"><span class="result-icon">💡</span> <strong>띄어쓰기는 피하기.</strong> 꼭 쓰려면 경로를 "따옴표"로 감싸야 합니다</div>
+        </div>
+      `;
+    }
+  },
+  {
     id:'1-E', section:'준비', title:'Git 설치',
     preview() {
       return termMock([
