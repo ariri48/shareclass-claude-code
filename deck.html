@@ -899,30 +899,39 @@
     <span class="chip chip-rose">보안 수칙</span>
     <h2 class="slide-h2 mt-3">AI는 도구입니다. 최종 판단은 사람이. <span style="font-size:18px;color:var(--muted);">AI 믿어야하지만, 믿지말아야할 부분.</span></h2>
     <div class="grid-cards gc-3 mt-6">
+      <div class="tile-rose">
+        <div class="text-2xl">🚫</div>
+        <div class="font-bold mt-2">절대 입력 금지</div>
+        <div class="small mt-2">
+          <b>개인정보</b>: 주민번호, 계좌번호, 카드번호<br/>
+          <b>크리덴셜</b>: 비밀번호, API키, 토큰<br/>
+          <b>영업비밀</b>: 전략기획, 기밀 자료
+        </div>
+      </div>
       <div class="tile">
         <div class="text-2xl">🎭</div>
-        <div class="font-bold mt-2">민감 정보 마스킹</div>
-        <div class="small mt-2">이름·주민번호 등은 가명 처리 후 요청</div>
+        <div class="font-bold mt-2">마스킹 후 사용</div>
+        <div class="small mt-2">이름·이메일·전화번호는 가명 처리 후 요청<br/>예: "홍길동" → "직원A"</div>
       </div>
       <div class="tile">
         <div class="text-2xl">🔍</div>
         <div class="font-bold mt-2">결과물 검증</div>
-        <div class="small mt-2">AI가 만든 숫자/금액은 반드시 원본과 대조</div>
-      </div>
-      <div class="tile">
-        <div class="text-2xl">📜</div>
-        <div class="font-bold mt-2">사내 정책 준수</div>
-        <div class="small mt-2">회사 보안 정책 범위 내에서 사용</div>
+        <div class="small mt-2">AI가 만든 숫자·금액·날짜는<br/><b>반드시 원본과 대조</b></div>
       </div>
     </div>
     <div class="tile-amber mt-4">
-      <div class="font-bold">📌 왓츠업 공지 확인</div>
-      <div class="mono small mt-2">https://whatsup.nhnent.com/shortCut/boardArticle/356790</div>
-      <ul class="mt-3 text-sm space-y-1">
-        <li>• 외부 AI 도구 사용 시 사내 정책 확인 필수</li>
-        <li>• 민감 정보(인사·고객 개인정보) 처리 주의</li>
-        <li>• 회사 보안 정책에 따라 사용 범위 결정</li>
+      <div class="font-bold">📌 CLAUDE.md에 보안 규칙을 넣으면?</div>
+      <ul class="mt-2 text-sm space-y-1">
+        <li class="ok">AI가 .env 파일 읽기·출력을 자동으로 거부</li>
+        <li class="ok">민감 데이터 포함 파일 발견 시 내용 대신 존재 여부만 알려줌</li>
+        <li class="ok">API키, 비밀번호 하드코딩 시 자동 경고</li>
       </ul>
+      <div class="small mt-2" style="color:#92400e;">→ 사람이 깜빡해도 AI가 보안 규칙을 지켜줌. <b>CLAUDE.md = 안전장치</b></div>
+    </div>
+    <div class="tile-soft mt-3">
+      <div class="font-bold">📌 왓츠업 공지 확인</div>
+      <div class="mono small mt-1">https://whatsup.nhnent.com/shortCut/boardArticle/356790</div>
+      <div class="small mt-1">외부 AI 도구 사용 시 사내 정책 확인 필수</div>
     </div>
   </div>
 </section>
@@ -2504,18 +2513,29 @@ description: 출시 자료 검수 자동 반복
 
 <span class="k"># 메일 톤</span>
 - 정중한 비즈니스 톤
-- 인사 + 본문 + 다음 단계</div>
+- 인사 + 본문 + 다음 단계
+
+<span class="y"># 날짜/요일</span>
+<span class="y">- 날짜·요일 언급 시 date 명령어로 검증</span>
+<span class="y">- 추측·암산 절대 금지</span>
+
+<span class="y"># 보안</span>
+<span class="y">- 개인정보·비밀번호·API키 입력 금지</span>
+<span class="y">- .env 파일 읽기/출력 금지</span>
+<span class="y">- 민감 데이터는 마스킹 후 요청</span></div>
       </div>
       <div class="tile-brand">
-        <div class="font-bold">WHY / WHAT / HOW</div>
+        <div class="font-bold">WHY / WHAT / HOW + 안전장치</div>
         <ul class="text-sm mt-2 space-y-2">
           <li><b>WHY</b> — 왜 이 일을 하는가? 목적·목표</li>
           <li><b>WHAT</b> — 무엇을 다루는가? 데이터·도구</li>
           <li><b>HOW</b> — 어떻게 하는가? 형식·규칙</li>
+          <li><b style="color:#ef4444;">🛡 GUARD</b> — 하지 말아야 할 것은? 보안·금지사항</li>
         </ul>
         <div class="quote mt-4" style="margin:0;background:#fff;">
           <b>Before</b>: 매번 10줄 설명<br/>
-          <b>After</b>: "이번 주 주간보고 만들어줘" (1줄)
+          <b>After</b>: "이번 주 주간보고 만들어줘" (1줄)<br/>
+          <b style="color:#ef4444;">+</b> 보안 실수도 CLAUDE.md가 막아줌
         </div>
       </div>
     </div>
