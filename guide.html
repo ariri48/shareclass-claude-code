@@ -1,0 +1,1797 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>쉐어클래스 - 비개발자를 위한 Claude Code 입문</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,'Pretendard','Noto Sans KR',sans-serif;background:#f8fafc;color:#1a1a1a;line-height:1.6;overflow:hidden;height:100vh}
+
+/* ── Header ── */
+.header{background:#191919;color:#fff;padding:0 24px;height:48px;display:flex;align-items:center;gap:14px;flex-shrink:0;z-index:100}
+.header-logo{font-weight:800;font-size:14px;letter-spacing:-.3px}
+.header-sep{width:1px;height:18px;background:rgba(255,255,255,.2)}
+.header-title{font-size:13px;opacity:.85;flex:1}
+.header-lock{color:rgba(255,255,255,.25);font-size:11px;text-decoration:none}
+
+/* ── App Layout ── */
+.app{display:flex;flex-direction:column;height:100vh}
+.app-body{display:flex;flex:1;overflow:hidden}
+
+/* ── Sidebar ── */
+.sidebar{width:220px;background:#fff;border-right:1px solid #e2e8f0;overflow-y:auto;flex-shrink:0;padding:12px 0;display:flex;flex-direction:column}
+.sidebar::-webkit-scrollbar{width:4px}
+.sidebar::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:2px}
+.sb-section{margin-bottom:4px}
+.sb-title{font-size:11px;font-weight:700;color:#94a3b8;padding:10px 16px 4px;text-transform:uppercase;letter-spacing:.5px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;user-select:none}
+.sb-title:hover{color:#64748b}
+.sb-title .sb-chevron{font-size:9px;transition:transform .15s}
+.sb-title.collapsed .sb-chevron{transform:rotate(-90deg)}
+.sb-items{overflow:hidden;transition:max-height .2s ease}
+.sb-items.collapsed{max-height:0!important}
+.sb-item{display:flex;align-items:center;gap:8px;padding:7px 16px;font-size:13px;color:#475569;cursor:pointer;transition:all .15s;border-left:3px solid transparent}
+.sb-item:hover{background:#f1f5f9}
+.sb-item.active{background:#eef2ff;color:#4f46e5;font-weight:600;border-left-color:#4f46e5}
+.sb-item.completed{color:#16a34a}
+.sb-item .sb-label{font-size:11px;font-weight:700;color:#94a3b8;min-width:28px}
+.sb-item.active .sb-label{color:#4f46e5}
+.sb-item.completed .sb-label{color:#16a34a}
+.sb-item .sb-dot{width:6px;height:6px;border-radius:50%;background:#cbd5e1;flex-shrink:0}
+.sb-item.active .sb-dot{background:#4f46e5;width:8px;height:8px}
+.sb-item.completed .sb-dot{background:#16a34a}
+.sb-item .sb-text{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* ── Content Area ── */
+.content{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.content-header{padding:10px 24px;background:#fff;border-bottom:1px solid #e2e8f0;display:flex;justify-content:space-between;align-items:center;flex-shrink:0}
+.content-header h2{font-size:16px;font-weight:700;color:#1e293b}
+.content-header .step-counter{font-size:12px;color:#94a3b8;font-weight:600}
+.content-body{flex:1;display:grid;grid-template-columns:2fr 3fr;gap:0;overflow:hidden}
+
+/* ── Preview Panel (Left) ── */
+.preview-panel{background:#f1f5f9;padding:24px;display:flex;align-items:center;justify-content:center;border-right:1px solid #e2e8f0;overflow-y:auto}
+
+/* ── Text Panel (Right) ── */
+.text-panel{padding:24px 32px;overflow-y:auto}
+.text-panel::-webkit-scrollbar{width:5px}
+.text-panel::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:3px}
+.step-label{font-size:12px;font-weight:700;color:#4f46e5;background:#eef2ff;display:inline-block;padding:3px 12px;border-radius:20px;margin-bottom:12px}
+.step-desc{font-size:14px;color:#334155;line-height:1.7;margin-bottom:16px}
+
+/* Code block */
+.code-block{position:relative;margin:12px 0;background:#0f172a;border-radius:10px;overflow:hidden}
+.code-block-header{display:flex;justify-content:space-between;align-items:center;padding:8px 14px;background:rgba(255,255,255,.05);border-bottom:1px solid rgba(255,255,255,.08)}
+.code-block-header span{font-size:11px;color:#64748b;font-family:'Cascadia Code',monospace}
+.code-copy{background:rgba(255,255,255,.1);color:#94a3b8;border:1px solid rgba(255,255,255,.12);border-radius:6px;padding:3px 10px;font-size:11px;cursor:pointer;transition:.15s}
+.code-copy:hover{background:rgba(255,255,255,.2);color:#fff}
+.code-copy.copied{background:#10b981;color:#fff;border-color:#10b981}
+.code-block pre{margin:0;padding:14px;color:#e2e8f0;font-size:13px;line-height:1.7;font-family:'Cascadia Code','D2Coding','Fira Code',monospace;overflow-x:auto;white-space:pre-wrap}
+
+/* Success/Fail boxes */
+.result-box{padding:10px 14px;border-radius:8px;font-size:12.5px;margin:8px 0;display:flex;align-items:flex-start;gap:8px;line-height:1.5}
+.result-box.success{background:#ecfdf5;color:#065f46;border:1px solid #a7f3d0}
+.result-box.fail{background:#fef2f2;color:#991b1b;border:1px solid #fecaca}
+.result-box .result-icon{font-size:14px;flex-shrink:0}
+
+/* Tip box */
+.tip-box{padding:10px 14px;border-radius:8px;font-size:12.5px;margin:8px 0;background:#fffbeb;color:#92400e;border:1px solid #fde68a;line-height:1.5}
+
+/* Checkbox + Memo */
+.step-tools{margin-top:20px;padding-top:16px;border-top:1px solid #e2e8f0}
+.step-check{display:flex;align-items:center;gap:8px;font-size:13px;color:#475569;cursor:pointer}
+.step-check input{width:18px;height:18px;accent-color:#4f46e5;cursor:pointer}
+.step-check input:checked+span{color:#16a34a;text-decoration:line-through}
+.step-memo{width:100%;margin-top:10px;padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:13px;min-height:54px;resize:vertical;font-family:inherit;outline:none;background:#fafbfc}
+.step-memo:focus{border-color:#4f46e5;background:#fff;box-shadow:0 0 0 3px rgba(79,70,229,.08)}
+.step-memo::placeholder{color:#adb5bd}
+
+/* Compact table */
+.compact-table{width:100%;border-collapse:collapse;font-size:12.5px;margin:10px 0;border-radius:8px;overflow:hidden;border:1px solid #e2e8f0}
+.compact-table th{background:#191919;color:#fff;padding:8px 12px;text-align:left;font-weight:600;white-space:nowrap}
+.compact-table td{padding:8px 12px;border-bottom:1px solid #e2e8f0}
+.compact-table tr:last-child td{border-bottom:none}
+.compact-table tr:hover td{background:#f8fafc}
+
+/* ── Bottom Nav ── */
+.bottom-nav{padding:10px 24px;background:#fff;border-top:2px solid #e2e8f0;display:flex;justify-content:space-between;align-items:center;flex-shrink:0;box-shadow:0 -4px 12px rgba(0,0,0,.05)}
+.bottom-nav button{padding:10px 28px;border-radius:8px;border:none;font-size:14px;font-weight:700;cursor:pointer;transition:all .2s;font-family:inherit}
+.btn-prev{background:#f1f5f9;color:#475569}
+.btn-prev:hover{background:#e2e8f0}
+.btn-next{background:#4f46e5;color:#fff;padding:10px 36px;animation:pulse-next 2s infinite}
+.btn-next:hover{background:#4338ca}
+@keyframes pulse-next{0%,100%{box-shadow:0 0 0 0 rgba(79,70,229,.4)}50%{box-shadow:0 0 0 8px rgba(79,70,229,0)}}
+.bottom-nav button:disabled{opacity:.3;cursor:not-allowed;animation:none}
+.nav-center{text-align:center}
+.nav-label{font-size:13px;font-weight:600;color:#334155}
+.nav-counter{font-size:11px;color:#94a3b8;margin-top:1px}
+.nav-hint{font-size:10px;color:#94a3b8;margin-top:2px}
+
+/* ── Terminal Mockup ── */
+.term{background:#0f172a;border-radius:10px;padding:16px;width:100%;font-family:'Cascadia Code','D2Coding',monospace;font-size:12px;line-height:1.7;color:#e2e8f0}
+.term-bar{display:flex;gap:6px;margin-bottom:10px}
+.term-dot{width:10px;height:10px;border-radius:50%}
+.term .prompt{color:#22d3ee}
+.term .cmd{color:#f8fafc}
+.term .output{color:#94a3b8}
+.term .success{color:#4ade80}
+.term .error{color:#f87171}
+.term .comment{color:#475569;font-style:italic}
+.term .highlight{color:#fbbf24}
+
+/* ── File Preview Mockup ── */
+.file-mock{background:#fff;border:1px solid #e2e8f0;border-radius:10px;width:100%;overflow:hidden}
+.file-mock-bar{background:#f1f5f9;padding:8px 12px;font-size:11px;color:#64748b;border-bottom:1px solid #e2e8f0;font-weight:600;display:flex;align-items:center;gap:6px}
+.file-mock-body{padding:14px;font-size:12px;line-height:1.7;color:#334155}
+.file-mock-body .line{padding:1px 0}
+.file-mock-body .line-h1{font-size:14px;font-weight:700;color:#1e293b;margin:4px 0 2px}
+.file-mock-body .line-h2{font-size:13px;font-weight:700;color:#4f46e5;margin:4px 0 2px}
+.file-mock-body .line-h3{font-size:12px;font-weight:600;color:#0f766e;margin:2px 0}
+.file-mock-body .line-dim{color:#94a3b8}
+.file-mock-body .line-bold{font-weight:600;color:#1e293b}
+.file-mock-body .line-bullet{padding-left:12px}
+.file-mock-body .line-num{color:#94a3b8;font-family:'Cascadia Code',monospace;font-size:10px;margin-right:8px;display:inline-block;min-width:18px;text-align:right}
+
+/* ── Dooray Mockup ── */
+.dooray-mock{background:#fff;border:1px solid #e2e8f0;border-radius:10px;width:100%;overflow:hidden}
+.dooray-mock-bar{background:#4f46e5;color:#fff;padding:10px 14px;font-size:12px;font-weight:600;display:flex;align-items:center;gap:8px}
+.dooray-mock-body{padding:14px;font-size:12px;line-height:1.7}
+.dooray-field{display:flex;gap:8px;padding:4px 0;border-bottom:1px solid #f1f5f9}
+.dooray-field:last-child{border-bottom:none}
+.dooray-field .df-label{color:#94a3b8;min-width:60px;font-weight:600;font-size:11px}
+.dooray-field .df-value{color:#334155;flex:1}
+.dooray-tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600;margin:1px 2px}
+.dooray-tag.tag-open{background:#dbeafe;color:#1d4ed8}
+.dooray-tag.tag-done{background:#dcfce7;color:#16a34a}
+.dooray-tag.tag-prog{background:#fef3c7;color:#92400e}
+
+/* ── Dashboard Mockup ── */
+.dash-mock{background:#fff;border:1px solid #e2e8f0;border-radius:10px;width:100%;overflow:hidden}
+.dash-bar-title{background:#f1f5f9;padding:8px 14px;font-size:11px;font-weight:700;color:#64748b;border-bottom:1px solid #e2e8f0}
+.dash-body{padding:14px;display:flex;gap:14px;flex-wrap:wrap}
+.dash-chart{flex:1;min-width:120px}
+.dash-chart-title{font-size:10px;font-weight:700;color:#94a3b8;margin-bottom:8px;text-transform:uppercase}
+.bar-chart{display:flex;align-items:flex-end;gap:6px;height:80px}
+.bar-item{flex:1;border-radius:4px 4px 0 0;position:relative;transition:height .3s}
+.bar-label{position:absolute;bottom:-16px;left:50%;transform:translateX(-50%);font-size:9px;color:#94a3b8;white-space:nowrap}
+.bar-val{position:absolute;top:-14px;left:50%;transform:translateX(-50%);font-size:9px;font-weight:700;color:#475569}
+.pie-chart{width:80px;height:80px;border-radius:50%;position:relative;margin:0 auto}
+.pie-legend{display:flex;flex-direction:column;gap:3px;margin-top:8px}
+.pie-legend-item{display:flex;align-items:center;gap:4px;font-size:9px;color:#475569}
+.pie-legend-dot{width:8px;height:8px;border-radius:2px;flex-shrink:0}
+
+/* ── Email Mockup ── */
+.email-mock{background:#fff;border:1px solid #e2e8f0;border-radius:10px;width:100%;overflow:hidden}
+.email-mock-bar{background:#f1f5f9;padding:8px 14px;font-size:11px;font-weight:700;color:#64748b;border-bottom:1px solid #e2e8f0;display:flex;align-items:center;gap:6px}
+.email-mock-body{padding:14px;font-size:12px;line-height:1.7;color:#334155}
+.email-to{display:flex;gap:6px;align-items:center;padding:4px 0;font-size:11px}
+.email-to .to-label{color:#94a3b8;font-weight:600}
+.email-to .to-val{color:#334155}
+.email-sep{border-bottom:1px solid #e2e8f0;margin:6px 0}
+.email-amount{font-weight:700;color:#4f46e5}
+
+/* ── Compare Mockup ── */
+.compare-mock{width:100%;display:flex;gap:12px}
+.compare-card{flex:1;background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:12px;text-align:center}
+.compare-card.highlight{border-color:#4f46e5;box-shadow:0 0 0 2px rgba(79,70,229,.15)}
+.compare-icon{font-size:28px;margin-bottom:6px}
+.compare-name{font-size:11px;font-weight:700;color:#334155;margin-bottom:4px}
+.compare-desc{font-size:10px;color:#94a3b8;line-height:1.4}
+
+/* ── Permission Mockup ── */
+.perm-mock{background:#fff;border:1px solid #e2e8f0;border-radius:10px;width:100%;overflow:hidden;padding:16px}
+.perm-popup{background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:8px;padding:12px;margin-bottom:8px}
+.perm-popup-title{font-size:11px;font-weight:700;color:#475569;margin-bottom:6px}
+.perm-popup-item{display:flex;gap:6px;padding:3px 0;font-size:11px}
+.perm-popup-item .perm-key{color:#94a3b8;min-width:50px}
+.perm-popup-item .perm-val{color:#334155}
+.perm-badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700}
+.perm-badge.mode-ask{background:#fef3c7;color:#92400e}
+.perm-badge.mode-auto{background:#dcfce7;color:#16a34a}
+.perm-badge.mode-plan{background:#dbeafe;color:#1d4ed8}
+
+/* ── Before/After ── */
+.ba-mock{width:100%}
+.ba-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:0}
+.ba-card{border-radius:8px;padding:12px;font-size:11px;line-height:1.6}
+.ba-card.before{background:#fef2f2;border:1px solid #fecaca}
+.ba-card.after{background:#ecfdf5;border:1px solid #a7f3d0}
+.ba-card .ba-label{font-size:10px;font-weight:700;margin-bottom:4px}
+.ba-card.before .ba-label{color:#991b1b}
+.ba-card.after .ba-label{color:#065f46}
+
+/* ── Tooltip ── */
+.tip-trigger{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;background:#e2e8f0;color:#475569;font-size:11px;font-weight:700;cursor:pointer;margin-left:4px;position:relative;vertical-align:middle;user-select:none}
+.tip-trigger:hover{background:#cbd5e1}
+.tip-bubble{display:none;position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);background:#1e293b;color:#f1f5f9;padding:10px 14px;border-radius:8px;font-size:12px;line-height:1.6;width:max-content;max-width:320px;z-index:50;box-shadow:0 4px 16px rgba(0,0,0,.2);font-weight:400;text-align:left;white-space:normal}
+.tip-bubble::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:6px solid transparent;border-top-color:#1e293b}
+.tip-trigger.active .tip-bubble{display:block}
+
+/* ── Floating Buttons ── */
+.submit-fab{position:fixed;bottom:88px;right:20px;background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#fff;border:none;padding:14px 24px;border-radius:999px;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 8px 24px rgba(79,70,229,.4);z-index:100;transition:transform .2s}
+.submit-fab:hover{transform:scale(1.05)}
+.scroll-top{position:fixed;bottom:148px;right:24px;width:42px;height:42px;border-radius:50%;background:#191919;color:#fff;border:none;font-size:18px;cursor:pointer;display:none;align-items:center;justify-content:center;box-shadow:0 2px 12px rgba(0,0,0,.2);z-index:50}
+.scroll-top.show{display:flex}
+
+/* ── Responsive ── */
+@media(max-width:900px){
+  .sidebar{width:180px}
+  .content-body{grid-template-columns:1fr}
+  .preview-panel{display:none}
+}
+@media(max-width:640px){
+  .sidebar{display:none}
+  .text-panel{padding:16px}
+}
+@media print{.sidebar,.bottom-nav,.submit-fab,.scroll-top,#chat-btn,#chat-panel{display:none!important}.app-body{display:block}.content-body{display:block}}
+</style>
+</head>
+<body>
+<script>
+(function(){
+  var expire = new Date('2026-12-31T23:59:59+09:00');
+  if(new Date() > expire){
+    document.documentElement.innerHTML = '<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>비공개</title></head>'
+      + '<body style="margin:0;height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#4f46e5,#7c3aed);font-family:Pretendard,system-ui,sans-serif;">'
+      + '<div style="text-align:center;color:#fff;padding:40px;">'
+      + '<div style="font-size:64px;margin-bottom:24px;">🦋</div>'
+      + '<h1 style="font-size:36px;font-weight:800;margin:0;">현재 공개 기간이 아닙니다</h1>'
+      + '<p style="font-size:20px;margin-top:16px;color:#e0e7ff;">다음 교육에서 만나요!</p>'
+      + '</div></body>';
+    throw 'expired';
+  }
+})();
+</script>
+
+<div class="app">
+  <!-- Header -->
+  <header class="header">
+    <span class="header-logo">AI School</span>
+    <span class="header-sep"></span>
+    <span class="header-title">비개발자를 위한 Claude Code 입문</span>
+    <button onclick="resetAllProgress()" style="background:none;border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.6);font-size:11px;padding:4px 10px;border-radius:6px;cursor:pointer;font-family:inherit;" title="체크/메모 전체 초기화">♻️ 초기화</button>
+  </header>
+
+  <div class="app-body">
+    <!-- Sidebar -->
+    <nav class="sidebar" id="sidebar"></nav>
+
+    <!-- Main Content -->
+    <div class="content">
+      <div class="content-header">
+        <h2 id="contentTitle">0-A &middot; 표지</h2>
+        <span class="step-counter" id="stepCounter">1 / 29</span>
+      </div>
+      <div class="content-body">
+        <div class="preview-panel" id="previewPanel"></div>
+        <div class="text-panel" id="textPanel"></div>
+      </div>
+      <div class="bottom-nav">
+        <button class="btn-prev" id="btnPrev" onclick="prevStep()">&larr; 이전</button>
+        <div class="nav-center">
+          <div class="nav-label" id="navLabel">0-A &middot; 표지</div>
+          <div class="nav-counter" id="navCounter">1 / 29</div>
+          <div class="nav-hint">&#8592; &#8594; 키보드로 이동</div>
+        </div>
+        <button class="btn-next" id="btnNext" onclick="nextStep()">다음 &rarr;</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Floating buttons -->
+<button class="submit-fab" onclick="generateSubmitPrompt()">&#x1F4EE; 과제 제출</button>
+<button class="scroll-top" id="scrollTopBtn" onclick="document.getElementById('textPanel').scrollTop=0">&#8593;</button>
+
+<script>
+// ═══════════════════════════════════════════════════════
+// STEPS DATA
+// ═══════════════════════════════════════════════════════
+const STEPS = [
+  // ── 0. 안내 ──
+  {
+    id:'0-A', section:'안내', title:'표지',
+    preview() {
+      return `<div style="text-align:center;width:100%;">
+        <div style="font-size:64px;margin-bottom:20px;">🦋</div>
+        <div style="font-size:11px;font-weight:700;color:#4f46e5;background:#eef2ff;display:inline-block;padding:4px 14px;border-radius:20px;margin-bottom:16px;">SHARE CLASS 2026</div>
+        <h1 style="font-size:28px;font-weight:800;color:#1e293b;line-height:1.3;margin-bottom:12px;">비개발자를 위한<br>Claude Code<br>업무 자동화 입문</h1>
+        <div style="font-size:13px;color:#64748b;line-height:1.8;">
+          <div>👩‍🏫 NHN Cloud 파트너지원팀 정유경</div>
+        </div>
+      </div>`;
+    },
+    content() {
+      return `
+        <div class="step-label">환영합니다!</div>
+        <p class="step-desc" style="font-size:16px;font-weight:700;color:#1e293b;margin-bottom:16px;">설치부터 활용까지, 2시간 완성 실습형 교육</p>
+        <p class="step-desc">코딩 경험이 전혀 없어도 괜찮습니다.<br><strong>한국어로 얘기하면 되는</strong> AI 업무 자동화를 배워봅니다.</p>
+        <div style="margin:20px 0;padding:16px;background:linear-gradient(135deg,#eef2ff,#ede9fe);border:1px solid #c7d2fe;border-radius:12px;">
+          <div style="font-weight:700;font-size:14px;color:#4338ca;margin-bottom:10px;">📖 오늘 배울 내용</div>
+          <div style="font-size:13px;color:#4338ca;line-height:1.8;">
+            <div><strong>준비</strong> — 필요한 프로그램 설치 (따라하기만 하면 됩니다)</div>
+            <div><strong>이론</strong> — AI에게 잘 부탁하는 법</div>
+            <div><strong>실습</strong> — 매출 분석, 보고서, 메일 자동 발송 등 실무 체험</div>
+            <div><strong>마무리</strong> — 내 업무용 AI 비서 설정</div>
+          </div>
+        </div>
+        <div style="margin:16px 0;padding:14px;background:#ecfdf5;border:1px solid #a7f3d0;border-radius:10px;">
+          <div style="font-weight:700;font-size:13px;color:#065f46;margin-bottom:6px;">📎 강의 교안 (발표자료)</div>
+          <p style="font-size:12px;color:#065f46;margin:0 0 8px;">수업 중 화면에 띄우는 슬라이드 전체를 볼 수 있습니다.</p>
+          <a href="https://is.gd/VP36dG" target="_blank" style="display:inline-block;padding:6px 14px;background:#047857;color:#fff;border-radius:6px;font-size:12px;font-weight:600;text-decoration:none;">📺 강의 슬라이드 보기 →</a>
+        </div>
+        <div class="tip-box">💡 <strong>이 사이트 처음이라면</strong> — 오른쪽 하단 <strong>"다음 →"</strong> 버튼을 눌러 한 페이지씩 진행하세요. 왼쪽 목록에서 원하는 단계를 클릭해도 됩니다.</div>
+      `;
+    }
+  },
+  {
+    id:'0-B', section:'안내', title:'사이트 사용법',
+    preview() {
+      return `<div style="width:100%;display:flex;flex-direction:column;gap:14px;">
+        <div style="background:#fff;border:2px solid #e2e8f0;border-radius:10px;padding:16px;">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+            <span style="background:#4f46e5;color:#fff;font-size:16px;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;">1</span>
+            <span style="font-size:13px;font-weight:600;">왼쪽 목록에서 단계 선택</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+            <span style="background:#4f46e5;color:#fff;font-size:16px;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;">2</span>
+            <span style="font-size:13px;font-weight:600;">왼쪽=화면 미리보기 / 오른쪽=설명</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+            <span style="background:#4f46e5;color:#fff;font-size:16px;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;">3</span>
+            <span style="font-size:13px;font-weight:600;">📋 버튼으로 명령어 복사 → 붙여넣기</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span style="background:#10b981;color:#fff;font-size:16px;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;">✓</span>
+            <span style="font-size:13px;font-weight:600;">완료 체크 + 메모 남기기</span>
+          </div>
+        </div>
+      </div>`;
+    },
+    content() {
+      return `
+        <div class="step-label">0-B &middot; 사이트 사용법</div>
+        <p class="step-desc" style="font-weight:700;">이 사이트는 실습 교재입니다. 한 페이지씩 따라가면 됩니다.</p>
+
+        <p class="step-desc" style="margin-top:14px;"><strong>화면 구성</strong></p>
+        <table class="compact-table">
+          <tr><th>영역</th><th>설명</th></tr>
+          <tr><td><strong>왼쪽 목록</strong></td><td>전체 단계 목록. 클릭하면 해당 페이지로 이동</td></tr>
+          <tr><td><strong>왼쪽 패널</strong></td><td>"이렇게 보이면 성공" — 화면 미리보기</td></tr>
+          <tr><td><strong>오른쪽 패널</strong></td><td>설명 + 복사할 명령어 + 성공/실패 기준</td></tr>
+          <tr><td><strong>하단 버튼</strong></td><td>← 이전 / 다음 → 으로 페이지 이동</td></tr>
+        </table>
+
+        <p class="step-desc" style="margin-top:14px;"><strong>주요 기능</strong></p>
+        <table class="compact-table">
+          <tr><th>기능</th><th>사용법</th></tr>
+          <tr><td>📋 <strong>명령어 복사</strong></td><td>검은 박스 우측 "복사" 버튼 → 터미널에 붙여넣기 (Ctrl+V)</td></tr>
+          <tr><td>✅ <strong>완료 체크</strong></td><td>각 페이지 하단 체크박스로 진행 상태 표시</td></tr>
+          <tr><td>📝 <strong>메모</strong></td><td>각 페이지 하단 메모란에 느낀 점, 질문 등 자유롭게 기록</td></tr>
+          <tr><td>📮 <strong>과제 제출</strong></td><td>우측 하단 버튼 → 체크/메모 자동 수집 → Dooray 태스크 생성</td></tr>
+          <tr><td>💬 <strong>익명 채팅</strong></td><td>우측 하단 말풍선 → 수강생끼리 자유롭게 대화</td></tr>
+          <tr><td>⌨️ <strong>키보드</strong></td><td>← → 방향키로도 페이지 이동 가능</td></tr>
+        </table>
+
+        <div class="tip-box">💡 <strong>모바일에서도 접속 가능</strong>합니다. 화면이 작으면 왼쪽 목록이 자동으로 숨겨지고, 하단 버튼으로 이동하세요.</div>
+      `;
+    }
+  },
+  {
+    id:'0-C', section:'안내', title:'FAQ',
+    preview() {
+      return `<div style="width:100%;display:flex;flex-direction:column;gap:10px;">
+        <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:12px;">
+          <div style="font-size:13px;font-weight:700;color:#4f46e5;">Q. 코딩을 전혀 몰라도 되나요?</div>
+          <div style="font-size:12px;color:#475569;margin-top:4px;">A. 네! 한국어로 "~해줘" 하면 됩니다.</div>
+        </div>
+        <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:12px;">
+          <div style="font-size:13px;font-weight:700;color:#4f46e5;">Q. 설치가 안 되면요?</div>
+          <div style="font-size:12px;color:#475569;margin-top:4px;">A. 손 들어주세요! 보조강사가 도와드립니다.</div>
+        </div>
+        <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:12px;">
+          <div style="font-size:13px;font-weight:700;color:#4f46e5;">Q. 비용이 드나요?</div>
+          <div style="font-size:12px;color:#475569;margin-top:4px;">A. $20/월(Pro)부터 사용 가능, 많이 쓰면 Max $100/월 권장</div>
+        </div>
+      </div>`;
+    },
+    content() {
+      return `
+        <div class="step-label">0-C &middot; 자주 묻는 질문</div>
+
+        <p class="step-desc" style="font-weight:700;margin-bottom:4px;">Q. 코딩을 전혀 몰라도 되나요?</p>
+        <p class="step-desc" style="color:#475569;">네! 오늘 교육은 비개발자를 위해 설계되었습니다. "매출 분석해줘", "보고서 만들어줘" 같이 <strong>한국어로 얘기</strong>하면 AI가 알아서 처리합니다.</p>
+
+        <p class="step-desc" style="font-weight:700;margin-top:16px;margin-bottom:4px;">Q. Node.js, Python이 뭔가요? 왜 설치하나요?</p>
+        <p class="step-desc" style="color:#475569;"><strong>Node.js</strong>는 Claude Code를 실행하는 데 필요한 "엔진"입니다. 자동차에 엔진이 필요하듯, Claude Code에 Node.js가 필요합니다. <strong>Python</strong>은 엑셀 자동화, 대시보드 만들기 등 실습에 필요합니다. <strong>둘 다 설치만 하면 직접 다루실 일은 없습니다.</strong></p>
+
+        <p class="step-desc" style="font-weight:700;margin-top:16px;margin-bottom:4px;">Q. 설치가 안 되면 어떡하나요?</p>
+        <p class="step-desc" style="color:#475569;">손을 들어주세요! 보조강사가 도와드립니다. 또는 에러 메시지 전체를 <a href="https://claude.ai" target="_blank" style="color:#4f46e5;font-weight:600;">claude.ai</a>에 붙여넣으면 해결 방법을 알려줍니다.</p>
+
+        <p class="step-desc" style="font-weight:700;margin-top:16px;margin-bottom:4px;">Q. 비용이 드나요?</p>
+        <p class="step-desc" style="color:#475569;">Claude Code를 사용하려면 유료 구독이 필요합니다. <strong>Pro ($20/월)</strong>부터 사용 가능하고, 사용량이 많으면 <strong>Max ($100/월)</strong>를 권장합니다.</p>
+
+        <p class="step-desc" style="font-weight:700;margin-top:16px;margin-bottom:4px;">Q. 터미널이 뭔가요?</p>
+        <p class="step-desc" style="color:#475569;">컴퓨터에 글자로 명령을 내리는 <strong>검은 화면</strong>입니다. Windows에서는 <strong>"PowerShell"을 검색</strong>해서 열어주세요. (cmd도 있지만, 이 교육에서는 <strong>PowerShell을 기준</strong>으로 안내합니다.)</p>
+
+        <p class="step-desc" style="font-weight:700;margin-top:16px;margin-bottom:4px;">Q. npm이 뭔가요?</p>
+        <p class="step-desc" style="color:#475569;">Node.js를 설치하면 자동으로 같이 설치되는 <strong>"프로그램 설치 도구"</strong>입니다. 앱스토어에서 앱을 설치하듯, npm으로 Claude Code를 설치합니다. 따로 설치할 필요 없습니다.</p>
+
+        <p class="step-desc" style="font-weight:700;margin-top:16px;margin-bottom:4px;">Q. 회사 보안 프로그램 때문에 설치가 안 돼요</p>
+        <p class="step-desc" style="color:#475569;">사내 보안 정책으로 차단될 수 있습니다. 보조강사에게 알려주시면 <strong>관리자 권한 실행</strong> 또는 <strong>보안 예외 등록</strong>을 도와드립니다.</p>
+
+        <p class="step-desc" style="font-weight:700;margin-top:16px;margin-bottom:4px;">Q. 교육 후에도 이 사이트를 볼 수 있나요?</p>
+        <p class="step-desc" style="color:#475569;">공개 기간 종료 후에는 접속이 제한됩니다. 필요한 내용은 메모에 남겨두시거나 과제 제출 기능을 활용해주세요.</p>
+
+        <div class="tip-box">💡 <strong>준비가 되셨다면</strong> 하단 <strong>"다음 →"</strong> 버튼을 눌러 설치를 시작해보세요!</div>
+      `;
+    }
+  },
+
+  // ── 1. 준비 ──
+  {
+    id:'1-A', section:'준비', title:'Node.js 설치',
+    preview() {
+      return termMock([
+        {type:'prompt',text:'$ '},
+        {type:'cmd',text:'node -v'},
+        {type:'output',text:'v24.13.0'},
+        {type:'comment',text:'# Node.js 정상 설치 확인'}
+      ]);
+    },
+    content() {
+      return `
+        <div class="step-label">1-A &middot; Node.js 설치</div>
+        <div class="tip-box">💡 <strong>Node.js가 뭔가요?</strong> — Claude Code를 실행하기 위한 "엔진"입니다. 자동차에 엔진이 필요하듯, Claude Code에 Node.js가 필요합니다. <strong>설치만 하면 직접 다루실 일은 없습니다.</strong></div>
+        <p class="step-desc">Claude Code 실행에 필요합니다. 유일하게 직접 설치하는 것.${tip('나머지는 전부 Claude가 설치해줌')}</p>
+        <p class="step-desc"><strong>설치 방법:</strong></p>
+        <div style="display:flex;flex-direction:column;gap:8px;margin:8px 0;">
+          <div class="result-box success"><span class="result-icon">1️⃣</span> <a href="https://nodejs.org" target="_blank" style="color:#065f46;font-weight:600;">nodejs.org</a> 사이트에 접속</div>
+          <div class="result-box success"><span class="result-icon">2️⃣</span> <strong>초록색 "LTS" 버튼</strong>을 클릭하세요 (왼쪽 큰 버튼). "Current"가 아닌 <strong>LTS</strong>를 선택!</div>
+          <div class="result-box success"><span class="result-icon">3️⃣</span> 다운로드된 파일(.msi) 실행 → <strong>"Next" 계속 클릭</strong> → 완료</div>
+          <div class="result-box success"><span class="result-icon">4️⃣</span> 설치 후 터미널을 <strong>새로 열어서</strong> 아래 명령어 입력</div>
+        </div>
+        ${codeBlock('node -v','bash')}
+        ${successBox('v18 이상 버전이 표시되면 성공 (예: v24.13.0)')}
+        ${failBox('버전이 안 나오면: 터미널을 닫고 다시 열어보세요. 그래도 안 되면 nodejs.org에서 재설치')}
+        <div class="tip-box">💡 <strong>터미널 여는 법:</strong> Windows 시작 버튼 옆 검색창에 <strong>"PowerShell"</strong> 입력 → 클릭. 파란 화면이 터미널입니다. 이 교육에서는 PowerShell을 기준으로 안내합니다.</div>
+      `;
+    }
+  },
+  {
+    id:'1-B', section:'준비', title:'Claude Code 설치',
+    preview() {
+      return termMock([
+        {type:'prompt',text:'$ '},
+        {type:'cmd',text:'npm install -g @anthropic-ai/claude-code'},
+        {type:'output',text:'added 1 package in 12s'},
+        {type:'success',text:'✓ claude-code installed successfully'}
+      ]);
+    },
+    content() {
+      return `
+        <div class="step-label">1-B &middot; Claude Code 설치</div>
+        <div class="tip-box">💡 <strong>npm이 뭔가요?</strong> — Node.js를 설치하면 자동으로 같이 설치되는 <strong>"프로그램 설치 도구"</strong>입니다. 앱스토어에서 앱을 다운받듯, npm으로 Claude Code를 설치합니다.</div>
+        <p class="step-desc">아래 명령어를 <strong>터미널에 복사 붙여넣기</strong>하세요.${tip('Ctrl+V로 붙여넣기. 터미널에서는 마우스 우클릭으로도 붙여넣기 가능')}</p>
+        ${codeBlock('npm install -g @anthropic-ai/claude-code','bash')}
+        ${successBox('added 1 package 메시지 나오면 성공')}
+        <div class="tip-box">💡 <strong>복사 붙여넣기 팁:</strong> 위 검은 박스의 <strong>"📋 복사" 버튼</strong>을 클릭 → 터미널에서 <strong>Ctrl+V</strong> (또는 마우스 우클릭) → Enter</div>
+      `;
+    }
+  },
+  {
+    id:'1-C', section:'준비', title:'첫 로그인',
+    preview() {
+      return termMock([
+        {type:'prompt',text:'$ '},
+        {type:'cmd',text:'claude'},
+        {type:'output',text:''},
+        {type:'highlight',text:'Welcome to Claude Code!'},
+        {type:'output',text:'Opening browser for authentication...'},
+        {type:'success',text:'✓ Authenticated successfully'}
+      ]);
+    },
+    content() {
+      return `
+        <div class="step-label">1-C &middot; 첫 로그인</div>
+        <p class="step-desc">터미널에 <strong>claude</strong> 한 단어만 입력하면 브라우저가 자동으로 열립니다.${tip('Google 계정으로 가능. 회사 이메일 or 개인 이메일 모두 OK')}</p>
+        ${codeBlock('claude','bash')}
+        <div style="display:flex;flex-direction:column;gap:6px;margin:8px 0;">
+          <div class="result-box success"><span class="result-icon">1️⃣</span> 터미널에 <strong>claude</strong> 입력 → Enter</div>
+          <div class="result-box success"><span class="result-icon">2️⃣</span> 브라우저가 자동으로 열림 → <strong>Google 계정으로 로그인</strong></div>
+          <div class="result-box success"><span class="result-icon">3️⃣</span> "인증 완료" 메시지 → 터미널로 돌아오기</div>
+        </div>
+        ${successBox('Welcome to Claude Code! 메시지가 나오면 성공')}
+        <div class="tip-box">💡 <strong>브라우저가 안 열리면</strong> — 터미널에 표시된 URL을 직접 복사해서 브라우저 주소창에 붙여넣으세요.</div>
+      `;
+    }
+  },
+  {
+    id:'1-D', section:'준비', title:'첫 대화',
+    preview() {
+      return termMock([
+        {type:'prompt',text:'> '},
+        {type:'cmd',text:'안녕하세요'},
+        {type:'output',text:''},
+        {type:'output',text:'안녕하세요! 무엇을 도와드릴까요?'},
+        {type:'output',text:'파일 분석, 코드 작성, 데이터 정리 등'},
+        {type:'output',text:'다양한 작업을 도와드릴 수 있습니다.'}
+      ]);
+    },
+    content() {
+      return `
+        <div class="step-label">1-D &middot; 첫 대화</div>
+        <div class="tip-box">💡 <strong>지금부터가 핵심!</strong> — 터미널에 <strong>></strong> 표시가 나오면, 그 뒤에 한국어로 자유롭게 입력하면 됩니다. 코드가 아니라 <strong>일상 대화</strong>처럼 쓰면 됩니다.</div>
+        <p class="step-desc">응답 오면 성공! 이제 나머지는 Claude에게 시키면 됩니다.${tip('claude 입력 후 나오는 > 프롬프트에서 자연어로 대화')}</p>
+        ${codeBlock('안녕하세요','text')}
+        ${successBox('한국어 응답이 나오면 완료')}
+      `;
+    }
+  },
+  {
+    id:'1-D2', section:'준비', title:'작업 폴더 만들기',
+    preview() {
+      return `<div style="width:100%;background:#0f172a;border-radius:10px;padding:16px;font-family:monospace;font-size:12px;color:#e2e8f0;line-height:1.9;">
+        <div style="color:#94a3b8;margin-bottom:6px;"># 추천 폴더 구조</div>
+        📁 내문서<br>
+        &nbsp;└─ 📁 ai-작업 <span style="color:#fbbf24;">← 여기서 Claude 켜기</span><br>
+        &nbsp;&nbsp;&nbsp;&nbsp;├─ 📁 보고서<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;├─ 📁 자료조사<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;├─ 📁 매출분석<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;└─ 📁 연습장 <span style="color:#94a3b8;">(실험용)</span>
+      </div>`;
+    },
+    content() {
+      return `
+        <div class="step-label">1-D2 &middot; 작업 폴더 만들기</div>
+        <div class="tip-box">💡 <strong>AI를 본격적으로 쓰기 전에!</strong> — Claude Code는 <strong>"켠 폴더"와 그 안쪽만 볼 수 있어요.</strong> 그 폴더가 곧 Claude의 작업실입니다. 그래서 폴더를 어떻게 두고 켜느냐가 처음부터 중요해요.</div>
+
+        <p class="step-desc"><strong>❌ 하지 말 것</strong></p>
+        <p class="step-desc">바탕화면 전체나 C드라이브 최상위·홈 폴더처럼 <strong>너무 넓은 곳에서 켜지 마세요.</strong> Claude가 수많은 파일을 보게 되어 헷갈리고 실수 위험도 커집니다.</p>
+
+        <p class="step-desc" style="margin-top:16px;"><strong>✅ 권장: AI 전용 폴더 하나 + 일거리별 하위 폴더</strong></p>
+        <p class="step-desc">내 문서 안에 <strong>ai-작업</strong> 같은 폴더를 하나 만들고, 그 안에 <strong>일거리별 하위 폴더</strong>를 두세요. (왼쪽 그림 참고)</p>
+        <div style="display:flex;flex-direction:column;gap:6px;margin:8px 0;">
+          <div class="result-box success"><span class="result-icon">①</span> 일(프로젝트) <strong>하나당 폴더 하나</strong></div>
+          <div class="result-box success"><span class="result-icon">②</span> 관련 파일은 <strong>그 폴더 안에 모아두기</strong></div>
+          <div class="result-box success"><span class="result-icon">③</span> Claude Code는 항상 <strong>"그 일의 폴더"에서 켜기</strong></div>
+        </div>
+
+        <p class="step-desc" style="margin-top:16px;"><strong>그래서 어떻게 "그 폴더에서" 켜나요?</strong></p>
+        <p class="step-desc">그 폴더 위치에서 터미널을 연 다음 <strong>claude</strong> 를 실행하면 됩니다.</p>
+        <p class="step-desc"><strong>🍎 Mac:</strong> Finder에서 폴더 우클릭 → "폴더에서 새로운 터미널 열기". 또는 터미널에서:</p>
+        ${codeBlock('cd ~/Documents/ai-작업/보고서\nclaude','bash')}
+        <p class="step-desc"><strong>🪟 Windows:</strong> 폴더 안에서 주소창에 cmd 입력 후 Enter. 또는 PowerShell에서:</p>
+        ${codeBlock('cd $HOME\\Documents\\ai-작업\\보고서\nclaude','bash')}
+        <div class="tip-box">💡 지금 어느 폴더에 있는지 보려면 — Mac: <strong>pwd</strong> / Windows: <strong>cd</strong>(단독 입력) → 현재 폴더 경로가 나와요.</div>
+        ${successBox('원하는 폴더에서 claude 가 실행되면 완료')}
+
+        <p class="step-desc" style="margin-top:16px;"><strong>🔗 두레이(1-G)와의 관계</strong></p>
+        <div class="tip-box">두레이 MCP는 한 번 설치하면 <strong>어느 폴더에서 켜도 동작</strong>해요(설치할 때 절대경로로 등록되니까요). 그러니 작업 폴더는 <strong>"내 파일을 일거리별로 정리"</strong>하는 용도로 쓰면 됩니다. 단, 중요한 자료가 든 폴더에서 켤 때 Claude가 파일을 바꾸기 전 <strong>매번 허용/거부를 물어보니</strong> 잘 보고 누르세요.</div>
+
+        <p class="step-desc" style="margin-top:16px;"><strong>폴더 이름 팁</strong></p>
+        <div style="display:flex;flex-direction:column;gap:6px;margin:8px 0;">
+          <div class="result-box success"><span class="result-icon">💡</span> 한글도 되지만 <strong>영문·숫자·하이픈(-)</strong>이 터미널에서 편해요 (예: reports, dooray-work)</div>
+          <div class="result-box success"><span class="result-icon">💡</span> <strong>띄어쓰기는 피하기.</strong> 꼭 쓰려면 경로를 "따옴표"로 감싸야 합니다</div>
+        </div>
+      `;
+    }
+  },
+  {
+    id:'1-E', section:'준비', title:'Git 설치',
+    preview() {
+      return termMock([
+        {type:'prompt',text:'> '},
+        {type:'cmd',text:'Git 설치해줘'},
+        {type:'output',text:''},
+        {type:'output',text:'Git을 설치하겠습니다.'},
+        {type:'output',text:'winget install --id Git.Git -e --source winget'},
+        {type:'success',text:'✓ Git 설치 완료'},
+        {type:'output',text:'git version 2.47.1.windows.2'}
+      ]);
+    },
+    content() {
+      return `
+        <div class="step-label">1-E &middot; Git 설치</div>
+        <div class="tip-box">💡 <strong>Git이 뭔가요?</strong> — 파일의 변경 이력을 관리하는 도구입니다. Word의 "변경 내용 추적"과 비슷하지만 더 강력합니다. Claude Code가 파일을 수정할 때 <strong>되돌리기</strong>를 가능하게 해줍니다. <strong>직접 사용할 일은 거의 없습니다.</strong></div>
+        <p class="step-desc"><strong>직접 설치할 필요 없습니다!</strong> Claude Code 안에서 말하면 됩니다.${tip('Claude가 winget 또는 직접 다운로드로 설치해줌')}</p>
+        ${codeBlock('Git 설치해줘','text')}
+        ${successBox('git version 표시되면 성공')}
+        <div class="result-box fail"><span class="result-icon">⚠️</span><strong>설치 실패 시:</strong> 회사 PC에서는 <strong>관리자 권한</strong>이 필요할 수 있습니다. PowerShell을 <strong>"관리자 권한으로 실행"</strong>한 뒤 다시 시도하거나, 보조강사에게 손 들어주세요.</div>
+        <div class="tip-box">💡 <strong>이 명령은 Claude Code 안에서</strong> 입력하세요 (<strong>></strong> 표시 뒤에). 일반 터미널이 아닙니다!</div>
+      `;
+    }
+  },
+  {
+    id:'1-F', section:'준비', title:'Python 설치',
+    preview() {
+      return termMock([
+        {type:'prompt',text:'> '},
+        {type:'cmd',text:'Python 설치해줘'},
+        {type:'output',text:''},
+        {type:'output',text:'Python을 설치하겠습니다.'},
+        {type:'success',text:'✓ Python 3.12.8 설치 완료'}
+      ]);
+    },
+    content() {
+      return `
+        <div class="step-label">1-F &middot; Python 설치</div>
+        <div class="tip-box">💡 <strong>Python이 뭔가요?</strong> — 세계에서 가장 많이 쓰는 프로그래밍 언어인데, 여러분이 직접 코딩할 필요는 없습니다! Claude Code가 엑셀 분석, 대시보드 생성 등을 할 때 <strong>내부적으로 Python을 사용</strong>합니다. 설치만 해두면 됩니다.</div>
+        <p class="step-desc">이것도 Claude Code 안에서 한마디면 끝.${tip('실습에서 Streamlit, pandas 등 Python 패키지 필요')}</p>
+        ${codeBlock('Python 설치해줘','text')}
+        ${successBox('Python 3.x 버전 표시되면 성공')}
+        <div class="result-box fail"><span class="result-icon">⚠️</span><strong>설치 실패 시:</strong> 회사 PC에서는 <strong>관리자 권한</strong>이 필요할 수 있습니다. PowerShell을 <strong>"관리자 권한으로 실행"</strong>한 뒤 다시 시도하거나, 보조강사에게 손 들어주세요.</div>
+      `;
+    }
+  },
+  {
+    id:'1-F2', section:'준비', title:'Git 기초 개념',
+    preview() {
+      return `<div style="width:100%;display:flex;flex-direction:column;gap:12px;">
+        <div style="display:flex;gap:10px;">
+          <div style="flex:1;background:#ecfdf5;border:1px solid #a7f3d0;border-radius:10px;padding:14px;text-align:center;">
+            <div style="font-size:24px;margin-bottom:6px;">🌍</div>
+            <div style="font-size:12px;font-weight:700;color:#065f46;">Public</div>
+            <div style="font-size:11px;color:#047857;margin-top:4px;">누구나 볼 수 있음</div>
+          </div>
+          <div style="flex:1;background:#fef2f2;border:1px solid #fecaca;border-radius:10px;padding:14px;text-align:center;">
+            <div style="font-size:24px;margin-bottom:6px;">🔒</div>
+            <div style="font-size:12px;font-weight:700;color:#991b1b;">Private</div>
+            <div style="font-size:11px;color:#b91c1c;margin-top:4px;">초대한 사람만 볼 수 있음</div>
+          </div>
+        </div>
+        <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:12px;text-align:center;">
+          <div style="font-size:11px;color:#64748b;">내 컴퓨터 (Local)</div>
+          <div style="font-size:18px;margin:4px 0;">💻 ↔️ ☁️</div>
+          <div style="font-size:11px;color:#64748b;">GitHub 서버 (Remote)</div>
+        </div>
+      </div>`;
+    },
+    content() {
+      return `
+        <div class="step-label">1-F2 &middot; Git 기초 개념</div>
+        <div class="tip-box">💡 1-E에서 Git을 설치했는데, <strong>Git이 정확히 뭐고 GitHub는 또 뭔지</strong> 간단히 알아봅니다. 외울 필요 없고, "아 이런 거구나" 정도만 알면 됩니다.</div>
+
+        <p class="step-desc" style="font-weight:700;margin-top:14px;">Git vs GitHub</p>
+        <table class="compact-table">
+          <tr><th>구분</th><th>설명</th><th>비유</th></tr>
+          <tr><td><strong>Git</strong></td><td>내 컴퓨터에서 파일 변경 이력을 관리하는 도구</td><td>Word의 "변경 내용 추적"</td></tr>
+          <tr><td><strong>GitHub</strong></td><td>Git으로 관리하는 파일을 인터넷에 올리는 서비스</td><td>Google Drive 같은 클라우드 저장소</td></tr>
+        </table>
+
+        <p class="step-desc" style="font-weight:700;margin-top:18px;">GitHub에 올리면 누구나 볼 수 있나요?</p>
+        <div style="display:flex;gap:10px;margin:10px 0;">
+          <div style="flex:1;padding:14px;background:#ecfdf5;border:1px solid #a7f3d0;border-radius:10px;">
+            <div style="font-weight:700;font-size:13px;color:#065f46;margin-bottom:6px;">🌍 Public (공개)</div>
+            <p style="font-size:12px;color:#047857;margin:0;line-height:1.6;">인터넷의 <strong>누구나</strong> 볼 수 있습니다. 오픈소스 프로젝트가 이 방식입니다.</p>
+          </div>
+          <div style="flex:1;padding:14px;background:#fff1f2;border:1px solid #fecaca;border-radius:10px;">
+            <div style="font-weight:700;font-size:13px;color:#991b1b;margin-bottom:6px;">🔒 Private (비공개)</div>
+            <p style="font-size:12px;color:#b91c1c;margin:0;line-height:1.6;"><strong>내가 초대한 사람만</strong> 볼 수 있습니다. 회사 프로젝트는 보통 이 방식입니다.</p>
+          </div>
+        </div>
+        <div class="tip-box">💡 <strong>GitHub에 올리지 않으면 내 컴퓨터에만 있습니다.</strong> Git을 쓴다고 자동으로 공개되는 게 아닙니다. "올리기(push)" 명령을 직접 해야 GitHub에 올라갑니다.</div>
+
+        <p class="step-desc" style="font-weight:700;margin-top:18px;">자주 나오는 Git 용어</p>
+        <table class="compact-table">
+          <tr><th>용어</th><th>뜻</th><th>쉬운 비유</th></tr>
+          <tr><td><strong>Repository (레포)</strong></td><td>프로젝트 폴더</td><td>하나의 프로젝트 = 하나의 레포</td></tr>
+          <tr><td><strong>Clone (클론)</strong></td><td>GitHub에서 내 컴퓨터로 복사</td><td>"다운로드"와 비슷</td></tr>
+          <tr><td><strong>Commit (커밋)</strong></td><td>변경 사항을 저장하는 단위</td><td>"저장" 버튼 누르기</td></tr>
+          <tr><td><strong>Push (푸시)</strong></td><td>내 컴퓨터 → GitHub로 올리기</td><td>클라우드에 업로드</td></tr>
+          <tr><td><strong>Pull (풀)</strong></td><td>GitHub → 내 컴퓨터로 가져오기</td><td>클라우드에서 다운로드</td></tr>
+        </table>
+
+        <div style="margin:16px 0;padding:14px;background:#eef2ff;border:1px solid #c7d2fe;border-radius:10px;">
+          <div style="font-weight:700;font-size:13px;color:#4338ca;margin-bottom:6px;">오늘 교육에서 Git을 쓰는 이유</div>
+          <p style="font-size:12px;color:#4338ca;margin:0;line-height:1.7;">실습에서 <strong>git clone</strong> 명령어로 Dooray MCP 소스를 다운로드합니다. 그 이후에는 Claude Code가 알아서 Git을 사용하니 <strong>여러분이 직접 Git 명령어를 외울 필요는 없습니다.</strong></p>
+        </div>
+      `;
+    }
+  },
+  {
+    id:'1-G', section:'준비', title:'Dooray MCP 설치',
+    preview() {
+      return termMock([
+        {type:'comment',text:'# 1) 소스 다운로드'},
+        {type:'cmd',text:'git clone https://github.com/ariri48/dooray-mcp.git'},
+        {type:'cmd',text:'cd dooray-mcp'},
+        {type:'comment',text:'# 2) 설치 마법사 (토큰 입력 -> 자동 연결)'},
+        {type:'cmd',text:'python setup.py'},
+        {type:'output',text:'Dooray API Token: ********'},
+        {type:'success',text:'✓ .env 저장 / 의존성 / 연결 검증'},
+        {type:'success',text:'✓ Claude Code에 MCP 등록 완료'},
+        {type:'comment',text:'# 3) Claude Code 안에서 확인'},
+        {type:'cmd',text:'/mcp'},
+        {type:'success',text:'● dooray-mcp   connected'}
+      ]);
+    },
+    content() {
+      return `
+        <div class="step-label">1-G &middot; Dooray MCP 설치</div>
+        <div class="tip-box">💡 <strong>이게 뭐예요? 어디에 써요?</strong> — MCP는 Claude Code에 <strong>"두레이 열쇠"를 쥐여주는 플러그인</strong>이에요. 설치하면 두레이 사이트를 직접 열지 않고도 <strong>"내 태스크 보여줘", "그 태스크에 댓글 달아줘"</strong>처럼 한국어로 부탁만 하면 Claude가 두레이 일을 대신 해줍니다.</div>
+
+        <p class="step-desc"><strong>🧰 시작 전 준비물 3가지</strong></p>
+        <div style="display:flex;flex-direction:column;gap:6px;margin:8px 0;">
+          <div class="result-box success"><span class="result-icon">✅</span> <strong>Python 3.10 이상</strong> (앞의 1-F 단계에서 설치했어요)</div>
+          <div class="result-box success"><span class="result-icon">✅</span> <strong>Claude Code</strong> 설치 완료</div>
+          <div class="result-box success"><span class="result-icon">✅</span> <strong>두레이 로그인</strong> 가능 + 토큰 붙여둘 <strong>메모장</strong> 하나 열어두기</div>
+        </div>
+        <div class="tip-box">⏱️ 천천히 해도 <strong>10분</strong>이면 끝납니다. 막히면 손 드세요!</div>
+
+        <p class="step-desc" style="margin-top:16px;"><strong>Step 1. 소스 코드 다운로드</strong></p>
+        <div class="result-box fail"><span class="result-icon">🚨</span><strong>주의:</strong> 아래 명령어는 <strong>일반 PowerShell</strong>에서 실행하세요. Claude Code 대화창(<strong>></strong> 표시)이 아닙니다! Claude Code가 켜져 있다면 <strong>/exit</strong>을 입력해 먼저 나오세요.</div>
+        <p class="step-desc">내 문서 폴더로 이동한 뒤 소스를 다운로드합니다. <strong>Documents 폴더 안에 dooray-mcp 폴더가 자동으로 생깁니다.</strong></p>
+        ${codeBlock('cd $HOME\\Documents\ngit clone https://github.com/ariri48/dooray-mcp.git\ncd dooray-mcp','powershell')}
+        ${successBox('"dooray-mcp" 폴더가 생기고 그 안으로 이동되면 성공')}
+        <div class="tip-box">💡 <strong>다른 위치에 받고 싶다면</strong> <code>cd 원하는경로</code>로 먼저 이동하세요. 어디에 받든 setup.py가 절대경로로 등록하므로 동작에는 문제없습니다.</div>
+
+        <p class="step-desc" style="margin-top:16px;"><strong>Step 2. 두레이 API 토큰 발급 (= 내 비밀 열쇠)</strong></p>
+        <p class="step-desc"><strong>토큰</strong>이란? Claude가 "이 사람이 진짜 본인 맞아요"라고 두레이에 보여주는 <strong>긴 비밀번호 한 줄</strong>이에요. 이게 있으면 매번 로그인할 필요가 없어요.</p>
+        <div style="display:flex;flex-direction:column;gap:6px;margin:8px 0;">
+          <div class="result-box success"><span class="result-icon">1️⃣</span> 브라우저에서 두레이 접속 → 우측 상단 <strong>내 프로필 아이콘</strong> 클릭</div>
+          <div class="result-box success"><span class="result-icon">2️⃣</span> <strong>설정</strong> → 좌측 메뉴에서 <strong>"API 토큰"</strong> 클릭</div>
+          <div class="result-box success"><span class="result-icon">3️⃣</span> <strong>"새 토큰 발급"</strong> 클릭 → 이름 입력 (예: Claude Code)</div>
+          <div class="result-box success"><span class="result-icon">4️⃣</span> 생성된 토큰을 <strong>메모장에 복사</strong> (이 화면을 닫으면 다시 못 봐요!)</div>
+        </div>
+        ${codeBlock('토큰은 [조직코드:토큰문자열] 형태예요 (가운데 콜론 포함, 통째로 복사)\n예) ajjt1imxmtj4:tyFuu5obTEGSO3sh5cxgow','text')}
+        <div class="tip-box">🔒 이 토큰은 <strong>비밀번호와 똑같습니다.</strong> 메신저·메일·캡처로 남에게 보내지 마세요. 새어나갔다면 위 화면에서 그 토큰을 삭제하고 새로 만들면 됩니다.</div>
+
+        <p class="step-desc" style="margin-top:16px;"><strong>Step 3. 설치 마법사 실행 — 여기서 토큰과 MCP가 "연결"됩니다 ⭐</strong></p>
+        <p class="step-desc">같은 터미널에서 아래를 실행하세요. 토큰을 물어보면 <strong>메모장 토큰을 붙여넣고(Ctrl+V) Enter</strong>, "테넌트 ID"는 <strong>그냥 Enter</strong>(기본값 사용)를 누르면 됩니다.</p>
+        <div class="tip-box" style="background:#fffbeb;border-color:#fcd34d;">
+          ⌨️ <strong>어디서 실행하나요? — Claude Code 대화창이 아니라 "일반 터미널"입니다.</strong> (맥: 터미널 앱 / 윈도우: PowerShell·명령 프롬프트). Step 1에서 <code>git clone</code> 한 그 창 그대로 쓰면 돼요.
+          <div style="margin-top:10px;display:flex;flex-direction:column;gap:5px;">
+            <div>1️⃣ <strong>터미널 열기</strong> (Claude Code 대화창 ❌)</div>
+            <div>2️⃣ <strong>dooray-mcp 폴더로 이동</strong> → <code>cd dooray-mcp</code> (Step 1에서 이미 들어갔다면 그대로 OK)</div>
+            <div>3️⃣ <code>python setup.py</code> &nbsp;← 여기!</div>
+            <div>4️⃣ <strong>"Dooray API Token:"</strong> 뜨면 복사한 토큰 붙여넣기(Ctrl+V) → Enter</div>
+            <div>5️⃣ <strong>✓ 완료 메시지들</strong> 확인</div>
+          </div>
+          <div style="margin-top:10px;font-size:12px;color:#92400e;">💡 <strong>dooray-mcp 폴더는 자동 생성이 아니에요.</strong> Step 1의 <code>git clone</code>이 폴더를 만들고, <code>cd</code>로 들어간 뒤 그 안에서 <code>setup.py</code>를 돌립니다.</div>
+        </div>
+        ${codeBlock('python setup.py','powershell')}
+        <div class="tip-box">💡 <strong>토큰 붙여넣기 팁:</strong> 토큰 앞뒤에 빈칸(공백)이 들어가지 않도록 주의하세요. 복사할 때 처음~끝까지 정확히 드래그해서 복사합니다.</div>
+        <div style="background:#0f172a;border-radius:10px;padding:14px;margin:8px 0;font-size:12px;font-family:monospace;color:#e2e8f0;line-height:1.7;">
+          <span style="color:#22d3ee;">Dooray API Token:</span> <span style="color:#fbbf24;">메모장 토큰 붙여넣기 → Enter</span><br>
+          <span style="color:#22d3ee;">테넌트 ID (기본: 1387695619080878080):</span> <span style="color:#fbbf24;">그냥 Enter</span><br>
+          <span style="color:#4ade80;">✓ .env 파일에 토큰 저장 완료</span><br>
+          <span style="color:#4ade80;">✓ 의존성 설치 / API 연결 검증 완료</span><br>
+          <span style="color:#4ade80;">✓ Claude Code에 MCP 등록 완료</span>
+        </div>
+        <p class="step-desc">마법사가 <strong>한 번에 자동으로</strong> 처리해 주는 것:</p>
+        <div style="display:flex;flex-direction:column;gap:6px;margin:8px 0;">
+          <div class="result-box success"><span class="result-icon">①</span> 토큰을 <strong>.env 파일</strong>에 안전하게 저장</div>
+          <div class="result-box success"><span class="result-icon">②</span> 필요한 <strong>부품(의존성)</strong> 설치 + 두레이 <strong>연결 확인</strong></div>
+          <div class="result-box success"><span class="result-icon">③</span> 내 두레이 <strong>프로젝트 자동 탐색</strong></div>
+          <div class="result-box success"><span class="result-icon">④</span> <strong>Claude Code에 MCP 등록</strong> (이게 토큰↔Claude 연결 고리!)</div>
+        </div>
+        ${successBox('"Claude Code에 MCP 등록 완료" 메시지가 나오면 성공')}
+
+        <p class="step-desc" style="margin-top:16px;"><strong>Step 4. Claude Code 재시작</strong></p>
+        <p class="step-desc">Claude Code가 이미 켜져 있었다면 <strong>완전히 껐다가 새로 켜세요.</strong> 안 그러면 방금 만든 연결이 반영되지 않아요.</p>
+
+        <p class="step-desc" style="margin-top:16px;"><strong>Step 5. 연결 확인 — /mcp 로 두 눈으로 확인하기 ✅</strong></p>
+        <p class="step-desc"><strong>① 터미널에서</strong> (등록됐는지):</p>
+        ${codeBlock('claude mcp list','bash')}
+        <p class="step-desc">→ 목록에 <strong>dooray-mcp</strong> 가 보이면 "등록"은 OK.</p>
+        <p class="step-desc"><strong>② Claude Code <em>안에서</em></strong> — 이게 진짜 "연결됐는지" 확인입니다. OS 터미널 말고, <strong>Claude와 대화하는 입력칸</strong>에 이렇게 칩니다:</p>
+        ${codeBlock('/mcp','text')}
+        <div style="display:flex;flex-direction:column;gap:6px;margin:8px 0;">
+          <div class="result-box success"><span class="result-icon">🟢</span> <strong>connected</strong> + 도구 개수가 보임 → <strong>연결 성공! 🎉</strong></div>
+          <div class="result-box success"><span class="result-icon">🟡</span> <strong>connecting / pending</strong> → 아직 연결 중. 잠깐 뒤 다시 <strong>/mcp</strong></div>
+          <div class="result-box fail"><span class="result-icon">🔴</span> <strong>failed</strong> (도구 0개) → 토큰/경로 문제. 아래 "혼자 고치기"를 보세요</div>
+        </div>
+        ${successBox('/mcp 에서 dooray-mcp 가 connected 면 전부 성공!')}
+
+        <p class="step-desc" style="margin-top:16px;"><strong>Step 6. 진짜 일 시켜보기</strong></p>
+        <p class="step-desc">Claude Code 입력칸에 적어보세요:</p>
+        ${codeBlock('내 개인 프로젝트에 "Claude Code 연결 성공 🎉" 태스크 하나 만들어줘','text')}
+        <p class="step-desc">처음엔 Claude가 <em>"dooray 도구를 써도 될까요?"</em>라고 물어볼 수 있어요. <strong>「허용(Allow)」</strong>을 누르면 됩니다. 두레이에 방금 만든 태스크가 생기면 끝! 🎉</p>
+        <div class="tip-box">💡 <strong>왜 "조회"가 아니라 "생성"부터 해보나요?</strong> — <strong>"내 태스크 보여줘"</strong>는 프로젝트에 쌓인 태스크가 <strong>수백~수천 건</strong>이면 한 번에 쏟아져 시간·토큰을 크게 써요. 첫 실습은 <strong>결과가 딱 1개</strong> 나오는 "태스크 1개 만들기"로 가볍게 성공을 맛보는 게 좋아요. (대량 조회는 교육 끝나고 천천히!)</div>
+
+        <p class="step-desc" style="margin-top:20px;"><strong>📁 .env 파일이란? (토큰↔MCP 연결 고리)</strong></p>
+        <div style="margin:8px 0;padding:14px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;">
+          <p class="step-desc" style="margin:0;"><strong>.env</strong> 파일은 <strong>비밀 정보를 저장하는 메모장</strong>이에요. MCP는 켜질 때 이 파일에서 토큰을 꺼내 두레이에 접속합니다.</p>
+          <table class="compact-table" style="margin-top:10px;">
+            <tr><th>궁금증</th><th>답변</th></tr>
+            <tr><td><strong>왜 필요한가요?</strong></td><td>API 토큰(비밀번호 같은 것)을 코드에 직접 적으면 노출 위험이 있어요. <strong>.env 파일에 따로 보관</strong>하면 안전합니다.</td></tr>
+            <tr><td><strong>어디에 있나요?</strong></td><td><strong>dooray-mcp 폴더 안</strong>에 자동 생성됩니다. 이름 앞에 점(.)이 있어 <strong>숨김 파일</strong>로 보일 수 있어요.</td></tr>
+            <tr><td><strong>직접 만들어야 하나요?</strong></td><td>아니요. <strong>setup.py가 자동으로</strong> 만들어줍니다. 직접 편집할 필요 없어요.</td></tr>
+          </table>
+          ${codeBlock('DOORAY_API_TOKEN=조직코드:토큰문자열\nDOORAY_TENANT_ID=1387695619080878080','text')}
+          <div class="tip-box" style="margin-top:8px;">💡 <strong>.env 파일은 절대 다른 사람에게 공유하지 마세요.</strong> 비밀번호가 들어있는 파일입니다.</div>
+        </div>
+
+        <p class="step-desc" style="margin-top:16px;"><strong>🛠️ 마법사(setup.py)가 안 될 때 — 수동 설치</strong></p>
+        <p class="step-desc">아래를 차례로 실행하면 손으로도 설치/등록할 수 있어요.</p>
+        ${codeBlock('pip install --user mcp requests python-dotenv\nclaude mcp add dooray-mcp -s user -- python C:/Users/내이름/Documents/dooray-mcp/run_server.py','powershell')}
+        <div class="tip-box">💡 <strong>"내이름"</strong> 부분을 본인의 Windows 사용자명으로 바꿔야 합니다. 탐색기 주소창에서 <strong>C:\\Users\\</strong> 뒤에 나오는 이름을 확인하세요. <code>python</code>이 안 되면 1-F 단계(Python 설치)부터 다시 → <code>python --version</code>으로 확인하세요.</div>
+
+        <p class="step-desc" style="margin-top:20px;"><strong>💪 컴퓨터를 바꿨거나 갑자기 안 될 때 — 혼자 고치기</strong></p>
+        <div class="tip-box">기억할 2가지: <strong>① 토큰은 한 번 받으면 계속 써요</strong>(두레이 웹에서 로그아웃돼도 토큰은 살아 있음). <strong>② dooray-mcp 폴더와 등록은 "그 컴퓨터에만" 저장</strong>됩니다. 그래서 컴퓨터를 바꾸면 Step 1~4를 다시 하면 돼요.</div>
+        <table class="compact-table">
+          <tr><th>이런 상황이면</th><th>이렇게 하세요</th></tr>
+          <tr><td>💻 <strong>새 컴퓨터/노트북</strong>으로 바꿨다</td><td>메모장의 토큰으로 <strong>Step 1~4 다시</strong> (git clone → python setup.py). 토큰 재발급 불필요</td></tr>
+          <tr><td>🔓 두레이 웹에서 <strong>로그아웃됐다</strong></td><td>걱정 마세요. 토큰은 그대로 동작합니다</td></tr>
+          <tr><td>🔴 /mcp에서 <strong>failed</strong> / "인증 실패·401"</td><td>토큰이 틀렸거나 만료. 토큰 재발급(Step 2) 후 <strong>python setup.py</strong> 다시</td></tr>
+          <tr><td>⚠️ <code>python</code> 명령어가 안 됨</td><td>Python 미설치 또는 PATH 미등록. 1-F 단계부터 다시 → <code>python --version</code> 확인</td></tr>
+          <tr><td>🤔 분명 설치했는데 두레이가 안 된다</td><td>Claude Code <strong>완전 종료 후 재실행</strong> → 다시 <strong>/mcp</strong></td></tr>
+          <tr><td>📁 dooray-mcp <strong>폴더를 옮겼다/지웠다</strong></td><td>등록된 경로가 깨진 것. 폴더 되돌리거나, 아래 "재설치"로 다시 등록</td></tr>
+          <tr><td>😵 메모장 토큰을 잃어버렸다</td><td>Step 2에서 <strong>새 토큰 발급</strong> 후 python setup.py</td></tr>
+        </table>
+        <p class="step-desc" style="margin-top:10px;"><strong>그래도 안 되면 — 깨끗하게 재설치:</strong> 기존 등록을 지우고 마법사를 다시 돌립니다.</p>
+        ${codeBlock('claude mcp remove dooray-mcp -s user\ncd $HOME\\Documents\\dooray-mcp\npython setup.py','powershell')}
+        <div class="tip-box">💡 메모장에 적어둔 토큰은 컴퓨터를 바꿔도 재사용하는 "재산"입니다. 비밀번호 관리 앱 등 안전한 곳에 보관해두면 다음에 5분이면 복구돼요.</div>
+      `;
+    }
+  },
+  {
+    id:'1-H', section:'준비', title:'설치 트러블슈팅',
+    preview() {
+      return `<div class="term" style="width:100%">
+        <div class="term-bar"><div class="term-dot" style="background:#f87171"></div><div class="term-dot" style="background:#fbbf24"></div><div class="term-dot" style="background:#4ade80"></div></div>
+        <div class="error">npm ERR! code EACCES</div>
+        <div class="error">permission denied, access '/usr/local/lib'</div>
+        <div class="output" style="margin-top:12px">────────────────</div>
+        <div class="comment" style="margin-top:8px"># 에러 메시지를 전부 복사해서</div>
+        <div class="comment"># claude.ai 웹에 붙여넣기!</div>
+        <div class="output" style="margin-top:12px">────────────────</div>
+        <div class="success" style="margin-top:8px">Claude: "관리자 권한으로 다시 실행해보세요."</div>
+        <div class="success">→ 문제 해결!</div>
+      </div>`;
+    },
+    content() {
+      return `
+        <div class="step-label">1-H &middot; 설치 트러블슈팅</div>
+        <p class="step-desc">설치 중 에러가 나면 당황하지 마세요. <strong>에러 메시지 전체를 복사</strong>해서 해결하면 됩니다.</p>
+        <div style="background:#0f172a;border-radius:10px;padding:16px;margin:12px 0;">
+          <div style="color:#f87171;font-size:13px;font-family:monospace;margin-bottom:8px;">npm ERR! code EACCES<br>permission denied...</div>
+          <div style="color:#fbbf24;font-size:13px;">↓ 전부 드래그해서 복사</div>
+        </div>
+        <p class="step-desc" style="margin-top:12px;"><strong>해결 방법 (택 1):</strong></p>
+        <div style="display:flex;flex-direction:column;gap:8px;margin:8px 0;">
+          <div class="result-box success"><span class="result-icon">1️⃣</span> <a href="https://claude.ai" target="_blank" style="color:#065f46;font-weight:600;">claude.ai</a> (웹)에 에러 메시지 붙여넣기 → 즉시 답변</div>
+          <div class="result-box success"><span class="result-icon">2️⃣</span> Claude Code가 이미 설치됐다면 Claude Code에 에러 붙여넣기</div>
+          <div class="result-box success"><span class="result-icon">3️⃣</span> 보조강사에게 손 들기</div>
+        </div>
+        <div class="tip-box">💡 에러 메시지는 <strong>빨간 글씨 전체</strong>를 복사하세요. 일부만 복사하면 정확한 답을 못 받습니다.</div>
+      `;
+    }
+  },
+  {
+    id:'1-I', section:'준비', title:'스킬 설치',
+    preview() {
+      return termMock([
+        {type:'prompt',text:'> '},
+        {type:'cmd',text:'curl -s https://raw.githubusercontent.com/...'},
+        {type:'output',text:''},
+        {type:'output',text:'Installing 105 skills...'},
+        {type:'output',text:'[============================] 100%'},
+        {type:'success',text:'✓ 105 skills installed'}
+      ]);
+    },
+    content() {
+      return `
+        <div class="step-label">1-I &middot; 스킬 설치</div>
+        <div class="tip-box">💡 <strong>스킬이 뭔가요?</strong> — Claude Code에 추가 기능을 넣어주는 <strong>"확장팩"</strong>입니다. 스마트폰에 앱을 깔듯, Claude Code에 스킬을 설치하면 웹 검색, 파일 관리, 자동화 등 더 많은 것을 할 수 있습니다.</div>
+        <p class="step-desc">105개 스킬 한번에 설치. <strong>Claude Code 대화창(> 표시) 안에서</strong> 아래 명령어를 입력하세요.${tip('스킬 = Claude Code 확장 기능. 웹 검색, 파일 관리, 자동화 등')}</p>
+        ${codeBlock('curl -s https://raw.githubusercontent.com/akillness/oh-my-skills/main/setup-all-skills-prompt.md','text')}
+        <div class="tip-box">💡 위 명령어를 Claude Code <strong>> 프롬프트</strong>에 붙여넣으면, Claude가 스킬 설치를 시작합니다. 설치 도중 물어보면 <strong>Yes</strong> / <strong>Enter</strong> / <strong>Install for me</strong>를 선택하세요.</div>
+        ${successBox('skills installed 메시지 나오면 성공')}
+      `;
+    }
+  },
+
+  // ── 2. 이론 ──
+  {
+    id:'2-A', section:'이론', title:'프롬프트 작성법',
+    preview() {
+      return `<div style="width:100%;display:flex;flex-direction:column;gap:14px;">
+        <div style="background:#fef2f2;border:2px solid #fecaca;border-radius:10px;padding:16px;">
+          <div style="font-size:12px;font-weight:700;color:#991b1b;margin-bottom:6px;">❌ Before</div>
+          <div style="font-size:16px;color:#7f1d1d;line-height:1.6;">"매출 분석해줘"</div>
+        </div>
+        <div style="text-align:center;font-size:20px;color:#94a3b8;">↓</div>
+        <div style="background:#ecfdf5;border:2px solid #a7f3d0;border-radius:10px;padding:16px;">
+          <div style="font-size:12px;font-weight:700;color:#065f46;margin-bottom:6px;">✅ After</div>
+          <div style="font-size:16px;color:#064e3b;line-height:1.6;">"이 엑셀 파일 열어서 팀별 매출 합산하고 순위 매겨줘. 표로 정리해줘"</div>
+        </div>
+      </div>`;
+    },
+    content() {
+      return `
+        <div class="step-label">2-A &middot; 프롬프트 작성법</div>
+        <table class="compact-table">
+          <tr><th>원칙</th><th>예시</th></tr>
+          <tr><td><strong>구체적으로</strong></td><td>"팀별 매출 합산하고 순위 매겨줘"</td></tr>
+          <tr><td><strong>형식 지정</strong></td><td>"표로 정리해줘", "마크다운으로"</td></tr>
+          <tr><td><strong>맥락 제공</strong></td><td>"이 엑셀 파일에서", "팀장님 보고용"</td></tr>
+          <tr><td><strong>막혔을 때</strong></td><td>"왜 안 되는지 설명해줘"</td></tr>
+        </table>
+      `;
+    }
+  },
+  {
+    id:'2-B', section:'이론', title:'CLAUDE.md',
+    preview() {
+      return fileMock('CLAUDE.md', [
+        {type:'h1',text:'# 프로젝트 설정'},
+        {type:'line',text:''},
+        {type:'h2',text:'## 역할'},
+        {type:'line',text:'나는 NHN Cloud 파트너지원팀 담당자입니다.'},
+        {type:'line',text:''},
+        {type:'h2',text:'## 규칙'},
+        {type:'bullet',text:'- 항상 한국어로 응답'},
+        {type:'bullet',text:'- 표는 마크다운 표로 작성'},
+        {type:'bullet',text:'- 금액은 천단위 쉼표 표시'},
+      ]);
+    },
+    content() {
+      return `
+        <div class="step-label">2-B &middot; CLAUDE.md</div>
+        <div class="tip-box">💡 <strong>CLAUDE.md가 뭔가요?</strong> — Claude Code에게 <strong>"나는 이런 사람이고, 이런 규칙을 지켜줘"</strong>라고 적어두는 <strong>설정 파일</strong>입니다. 한번 만들어두면 매번 설명할 필요 없이 AI가 기억합니다.</div>
+        <p class="step-desc">프로젝트 루트에 두면 매 대화마다 자동 적용.${tip('나의 역할, 규칙, 선호도를 적어두면 매번 설명할 필요 없음')}</p>
+        ${codeBlock('CLAUDE.md 파일 만들어줘','text')}
+        ${successBox('프로젝트 폴더에 CLAUDE.md 파일 생성됨')}
+      `;
+    }
+  },
+  {
+    id:'2-C', section:'이론', title:'권한 모드',
+    preview() {
+      return `<div class="perm-mock">
+        <div class="perm-popup">
+          <div class="perm-popup-title">&#x1F6E1;&#xFE0F; Shift+Tab 으로 모드 전환</div>
+          <div class="perm-popup-item"><span class="perm-badge mode-ask">accept edits on</span> <span class="perm-val">파일 편집 자동 승인</span></div>
+          <div class="perm-popup-item"><span class="perm-badge mode-auto">⏵⏵ don't ask on</span> <span class="perm-val">전부 자동 (물어보지 않음)</span></div>
+          <div class="perm-popup-item"><span class="perm-badge mode-plan">⏸ plan mode on</span> <span class="perm-val">계획만 수립 (실행 X)</span></div>
+        </div>
+        <div style="font-size:11px;color:#64748b;text-align:center">Shift+Tab 으로 모드 전환</div>
+      </div>`;
+    },
+    content() {
+      return `
+        <div class="step-label">2-C &middot; 권한 모드</div>
+        <p class="step-desc">Shift+Tab 으로 모드 전환.${tip('실습 중에는 기본 모드 권장. 익숙해지면 accept edits → don\'t ask 순서로')}</p>
+        <table class="compact-table">
+          <tr><th>모드</th><th>설명</th></tr>
+          <tr><td><strong>기본</strong></td><td>매 작업마다 승인 필요</td></tr>
+          <tr><td><strong>accept edits on</strong></td><td>파일 편집 자동 승인</td></tr>
+          <tr><td><strong>⏵⏵ don't ask on</strong></td><td>전부 자동 (물어보지 않음)</td></tr>
+          <tr><td><strong>⏸ plan mode on</strong></td><td>계획만 수립 (실행 X)</td></tr>
+        </table>
+        <p class="step-desc" style="margin-top:14px;"><strong>작업 중 물어볼 때 응답하기:</strong></p>
+        <table class="compact-table">
+          <tr><th>선택</th><th>의미</th><th>언제</th></tr>
+          <tr><td><strong>1. Yes</strong></td><td>이번 한 번만 허용</td><td>잘 모르겠을 때 (기본 선택)</td></tr>
+          <tr><td><strong>2. Yes, always</strong></td><td>같은 종류는 앞으로 자동 허용</td><td>반복 팝업이 귀찮을 때</td></tr>
+          <tr><td><strong>3. No</strong></td><td>거부</td><td>위험해 보일 때 (삭제 등)</td></tr>
+        </table>
+        <div class="tip-box">💡 대부분 <strong>1 (Yes)</strong> 누르면 됩니다. 잘못 눌러도 되돌릴 수 있어요.</div>
+      `;
+    }
+  },
+  {
+    id:'2-D', section:'이론', title:'제품 비교',
+    preview() {
+      return `<div class="compare-mock">
+        <div class="compare-card highlight">
+          <div class="compare-icon">&#x1F4BB;</div>
+          <div class="compare-name">Claude Code</div>
+          <div class="compare-desc">터미널 기반<br>파일 직접 수정<br>MCP 확장</div>
+        </div>
+        <div class="compare-card">
+          <div class="compare-icon">&#x1F5A5;&#xFE0F;</div>
+          <div class="compare-name">Cursor</div>
+          <div class="compare-desc">에디터 내장<br>코드 자동완성<br>개발자 특화</div>
+        </div>
+        <div class="compare-card">
+          <div class="compare-icon">&#x1F916;</div>
+          <div class="compare-name">Copilot</div>
+          <div class="compare-desc">VS Code 플러그인<br>코드 제안<br>개발자 특화</div>
+        </div>
+        <div class="compare-card">
+          <div class="compare-icon">&#x1F4AC;</div>
+          <div class="compare-name">ChatGPT</div>
+          <div class="compare-desc">웹 채팅<br>파일 업로드<br>범용 대화</div>
+        </div>
+      </div>`;
+    },
+    content() {
+      return `
+        <div class="step-label">2-D &middot; 제품 비교</div>
+        <p class="step-desc"><strong>AI 코딩 도구 비교</strong></p>
+        <table class="compact-table">
+          <tr><th></th><th>Claude Code</th><th>Cursor</th><th>Copilot</th><th>ChatGPT</th></tr>
+          <tr><td><strong>방식</strong></td><td>터미널</td><td>에디터</td><td>플러그인</td><td>웹</td></tr>
+          <tr><td><strong>파일 수정</strong></td><td>&#x2705; 직접</td><td>&#x2705; 직접</td><td>&#x25B3; 제안</td><td>&#x274C;</td></tr>
+          <tr><td><strong>비개발자</strong></td><td>&#x2705;</td><td>&#x25B3;</td><td>&#x274C;</td><td>&#x2705;</td></tr>
+          <tr><td><strong>확장(MCP)</strong></td><td>&#x2705;</td><td>&#x2705;</td><td>&#x25B3; 일부</td><td>&#x25B3;</td></tr>
+          <tr><td><strong>가격</strong></td><td>$20~/월</td><td>$20/월</td><td>$10/월</td><td>$20/월</td></tr>
+        </table>
+        <p class="step-desc" style="margin-top:16px;"><strong>Claude 제품군</strong></p>
+        <table class="compact-table">
+          <tr><th>제품</th><th>형태</th><th>특징</th></tr>
+          <tr><td>&#x1F310; <strong>claude.ai</strong></td><td>웹</td><td>채팅형, 파일 업로드, 누구나 쉽게</td></tr>
+          <tr><td>&#x1F91D; <strong>Cowork</strong></td><td>데스크톱 앱</td><td>화면 공유, 앱 위에서 바로 작업</td></tr>
+          <tr><td>&#x1F5A5; <strong>Code 앱</strong></td><td>데스크톱</td><td>GUI, 비개발자 친화적</td></tr>
+          <tr><td>&#x1F4BB; <strong>Code CLI</strong></td><td>터미널</td><td>가장 강력, MCP 확장, 오늘 배우는 것</td></tr>
+        </table>
+      `;
+    }
+  },
+
+  // ── 3. 실습 ──
+  {
+    id:'3-0', section:'실습', title:'실습 파일 다운로드',
+    preview() {
+      return `<div class="file-mock" style="width:100%">
+        <div class="file-mock-bar">📁 shareclass-실습 폴더</div>
+        <div class="file-mock-body" style="display:flex;flex-direction:column;gap:10px;">
+          <div style="display:flex;align-items:center;gap:8px;padding:8px;background:#f1f5f9;border-radius:6px;">
+            <span style="font-size:20px">📊</span>
+            <div><div style="font-weight:600;font-size:12px">매출_데이터_2026년4월.xlsx</div><div style="font-size:10px;color:#64748b">실습 3-A, 3-B</div></div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;padding:8px;background:#f1f5f9;border-radius:6px;">
+            <span style="font-size:20px">📧</span>
+            <div><div style="font-weight:600;font-size:12px">메일_발송_명단.xlsx</div><div style="font-size:10px;color:#64748b">실습 3-C</div></div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;padding:8px;background:#f1f5f9;border-radius:6px;">
+            <span style="font-size:20px">📋</span>
+            <div><div style="font-weight:600;font-size:12px">팀원_업무현황.xlsx</div><div style="font-size:10px;color:#64748b">실습 3-D</div></div>
+          </div>
+        </div>
+      </div>`;
+    },
+    content() {
+      return `
+        <div class="step-label">3-0 &middot; 실습 파일 다운로드</div>
+        <div class="tip-box">💡 <strong>실습에 필요한 엑셀 파일 3개</strong>를 다운로드합니다. 아래 파란색 "⬇ 다운로드" 를 각각 클릭하세요. 바탕화면에 <strong>shareclass-실습</strong> 폴더를 만들고 그 안에 넣어주세요.</div>
+        <p class="step-desc">바탕화면에 <strong>shareclass-실습</strong> 폴더를 만들고 아래 3개를 다운로드하세요.</p>
+        <div style="display:flex;flex-direction:column;gap:8px;margin:12px 0;">
+          <a href="files/매출_데이터_2026년4월.xlsx" download style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:#fff;border:1px solid #e2e8f0;border-radius:8px;text-decoration:none;color:#1e293b;font-size:13px;font-weight:600;">📊 매출_데이터_2026년4월.xlsx <span style="color:#4f46e5;font-size:12px;">⬇ 다운로드</span></a>
+          <a href="files/메일_발송_명단.xlsx" download style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:#fff;border:1px solid #e2e8f0;border-radius:8px;text-decoration:none;color:#1e293b;font-size:13px;font-weight:600;">📧 메일_발송_명단.xlsx <span style="color:#4f46e5;font-size:12px;">⬇ 다운로드</span></a>
+          <a href="files/팀원_업무현황.xlsx" download style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:#fff;border:1px solid #e2e8f0;border-radius:8px;text-decoration:none;color:#1e293b;font-size:13px;font-weight:600;">📋 팀원_업무현황.xlsx <span style="color:#4f46e5;font-size:12px;">⬇ 다운로드</span></a>
+        </div>
+        <div class="result-box success"><span class="result-icon">✅</span> 3개 모두 다운로드되면 완료</div>
+      `;
+    }
+  },
+  {
+    id:'3-A', section:'실습', title:'매출 분석',
+    preview() {
+      return fileMock('매출분석_결과.md', [
+        {type:'h2',text:'## 팀별 매출 순위'},
+        {type:'line',text:''},
+        {type:'bold',text:'| 순위 | 팀명      | 매출        |'},
+        {type:'line',text:'|------|----------|-------------|'},
+        {type:'line',text:'| 1    | 영업1팀  | 2,450,000   |'},
+        {type:'line',text:'| 2    | 영업3팀  | 1,890,000   |'},
+        {type:'line',text:'| 3    | 영업2팀  | 1,230,000   |'},
+        {type:'line',text:'| 4    | 기술팀    |   980,000   |'},
+      ]);
+    },
+    content() {
+      return `
+        <div class="step-label">3-A &middot; 매출 분석</div>
+        <div class="tip-box">💡 <strong>Claude Code를 실습 폴더에서 실행하세요!</strong> 터미널에서 <strong>cd Desktop/shareclass-실습</strong> 입력 후 <strong>claude</strong> 실행. 그래야 Claude가 엑셀 파일을 찾을 수 있습니다.</div>
+        <p class="step-desc">엑셀 파일 열고 분석 요청.${tip('실습 파일은 실습 폴더에 미리 준비되어 있음')}</p>
+        ${codeBlock('이 엑셀 파일 열어서 팀별 매출 합산하고 순위 매겨줘','text')}
+        ${successBox('팀별 매출 표가 생성되면 성공')}
+      `;
+    }
+  },
+  {
+    id:'3-B', section:'실습', title:'주간보고',
+    preview() {
+      return fileMock('주간보고.md', [
+        {type:'h1',text:'# 주간 업무 보고'},
+        {type:'dim',text:'2026년 5월 3주차'},
+        {type:'line',text:''},
+        {type:'h2',text:'## 1. 매출 현황'},
+        {type:'bullet',text:'- 전주 대비 12% 증가'},
+        {type:'bullet',text:'- 영업1팀 최고 실적 달성'},
+        {type:'line',text:''},
+        {type:'h2',text:'## 2. 주요 이슈'},
+        {type:'bullet',text:'- 신규 파트너 3사 계약 진행 중'},
+        {type:'line',text:''},
+        {type:'h2',text:'## 3. 다음 주 계획'},
+        {type:'bullet',text:'- QBR 대상 파트너 선정'},
+      ]);
+    },
+    content() {
+      return `
+        <div class="step-label">3-B &middot; 주간보고</div>
+        <p class="step-desc">분석 결과로 보고서 자동 생성.${tip('Claude가 분석한 데이터를 바탕으로 보고서 초안 작성')}</p>
+        ${codeBlock('매출 분석 결과로 팀장님께 보고할 주간보고 만들어줘','text')}
+        ${successBox('마크다운 보고서가 생성되면 성공')}
+      `;
+    }
+  },
+  {
+    id:'3-C', section:'실습', title:'정산 메일',
+    preview() {
+      return `<div class="email-mock">
+        <div class="email-mock-bar">&#x2709;&#xFE0F; 정산 메일 미리보기</div>
+        <div class="email-mock-body">
+          <div class="email-to"><span class="to-label">To:</span> <span class="to-val">partner-a@example.com</span></div>
+          <div class="email-to"><span class="to-label">제목:</span> <span class="to-val">2026년 3월 사용분 정산 안내</span></div>
+          <div class="email-sep"></div>
+          <div style="margin:6px 0">안녕하세요, NHN Cloud입니다.</div>
+          <div style="margin:6px 0">공급가액: <span class="email-amount">1,234,000원</span></div>
+          <div style="margin:6px 0">부가세: <span class="email-amount">123,400원</span></div>
+          <div style="margin:6px 0;font-weight:700">합계: <span class="email-amount">1,357,400원</span></div>
+        </div>
+      </div>`;
+    },
+    content() {
+      return `
+        <div class="step-label">3-C &middot; 정산 메일</div>
+        <p class="step-desc">파트너별 금액 포함 메일 자동 생성.${tip('엑셀의 파트너별 금액 데이터를 읽어 메일 초안 생성')}</p>
+        ${codeBlock('이 정산 데이터로 각 파트너에게 보낼 메일 초안 만들어줘','text')}
+        ${successBox('파트너별 메일 초안이 생성되면 성공')}
+        <div style="margin-top:14px;padding:14px;background:linear-gradient(135deg,#eef2ff,#ede9fe);border:1px solid #c7d2fe;border-radius:10px;">
+          <div style="font-weight:700;font-size:13px;color:#4338ca;margin-bottom:6px;">🚀 실무 TIP: Outlook 연동으로 대량 발송</div>
+          <p style="font-size:12px;color:#4338ca;line-height:1.6;margin:0;">Claude Code가 생성한 메일 초안을 <strong>Outlook과 연동하면 수십~수백 건을 한번에 자동 발송</strong>할 수 있습니다. 정산 메일, 안내 메일 등 반복 발송에 강력!</p>
+          <a href="https://helpdesk.dooray.com/share/pages/9wWo-xwiR66BO5LGshgVTg/2908919689264044467" target="_blank" style="display:inline-block;margin-top:8px;padding:6px 14px;background:#4f46e5;color:#fff;border-radius:6px;font-size:12px;font-weight:600;text-decoration:none;">📎 Dooray × Outlook 연동 가이드 →</a>
+        </div>
+      `;
+    }
+  },
+  {
+    id:'3-C2', section:'실습', title:'대량 메일 발송',
+    preview() {
+      return `<div class="term" style="width:100%">
+        <div class="term-bar"><div class="term-dot" style="background:#f87171"></div><div class="term-dot" style="background:#fbbf24"></div><div class="term-dot" style="background:#4ade80"></div></div>
+        <div class="prompt">Claude Code</div>
+        <div class="output" style="margin-top:8px">> 이 메일 초안들을 Outlook으로 발송해줘</div>
+        <div class="output" style="margin-top:10px">메일 발송 스크립트를 생성합니다...</div>
+        <div class="output">  ✉ 김파트너 (partner-a@...) → 발송 완료</div>
+        <div class="output">  ✉ 이파트너 (partner-b@...) → 발송 완료</div>
+        <div class="output">  ✉ 박파트너 (partner-c@...) → 발송 완료</div>
+        <div class="success" style="margin-top:8px">✓ 3건 발송 완료</div>
+      </div>`;
+    },
+    content() {
+      return `
+        <div class="step-label">3-C2 &middot; 대량 메일 발송</div>
+        <p class="step-desc">3-C에서 만든 메일 초안을 <strong>Outlook으로 자동 발송</strong>합니다.</p>
+        <p class="step-desc"><strong>Step 1.</strong> 메일 초안 확인 후 발송 요청</p>
+        ${codeBlock('이 메일 초안들을 Outlook으로 각 파트너에게 발송해줘','text')}
+        <p class="step-desc"><strong>Step 2.</strong> 더 구체적으로 지시하려면</p>
+        ${codeBlock('메일_발송_명단.xlsx의 이메일 주소로\n각 파트너별 정산 금액이 포함된 메일을\nOutlook으로 자동 발송하는 Python 스크립트 만들어줘','text')}
+        <div class="tip-box">💡 <strong>발송 전 꼭 확인:</strong> Claude가 만든 스크립트를 실행하기 전에 <strong>"먼저 1건만 테스트 발송해줘"</strong>라고 요청하세요. 전체 발송은 확인 후!</div>
+        <div class="result-box success"><span class="result-icon">✅</span> Outlook에서 보낸편지함 확인 → 발송 성공</div>
+        <div class="result-box fail"><span class="result-icon">❌</span> Outlook이 안 열려 있으면 실패. Outlook 실행 상태에서 진행하세요.</div>
+      `;
+    }
+  },
+  {
+    id:'3-D', section:'실습', title:'대시보드',
+    preview() {
+      return `<div class="dash-mock">
+        <div class="dash-bar-title">&#x1F4CA; Streamlit Dashboard</div>
+        <div class="dash-body">
+          <div class="dash-chart">
+            <div class="dash-chart-title">팀별 매출</div>
+            <div class="bar-chart">
+              <div class="bar-item" style="height:80px;background:#4f46e5"><div class="bar-val">245</div><div class="bar-label">영업1</div></div>
+              <div class="bar-item" style="height:60px;background:#7c3aed"><div class="bar-val">189</div><div class="bar-label">영업3</div></div>
+              <div class="bar-item" style="height:40px;background:#a78bfa"><div class="bar-val">123</div><div class="bar-label">영업2</div></div>
+              <div class="bar-item" style="height:30px;background:#c4b5fd"><div class="bar-val">98</div><div class="bar-label">기술</div></div>
+            </div>
+          </div>
+          <div class="dash-chart">
+            <div class="dash-chart-title">비율</div>
+            <div class="pie-chart" style="background:conic-gradient(#4f46e5 0% 38%,#7c3aed 38% 67%,#a78bfa 67% 86%,#c4b5fd 86% 100%)"></div>
+            <div class="pie-legend">
+              <div class="pie-legend-item"><div class="pie-legend-dot" style="background:#4f46e5"></div>영업1팀 38%</div>
+              <div class="pie-legend-item"><div class="pie-legend-dot" style="background:#7c3aed"></div>영업3팀 29%</div>
+              <div class="pie-legend-item"><div class="pie-legend-dot" style="background:#a78bfa"></div>영업2팀 19%</div>
+              <div class="pie-legend-item"><div class="pie-legend-dot" style="background:#c4b5fd"></div>기술팀 14%</div>
+            </div>
+          </div>
+        </div>
+      </div>`;
+    },
+    content() {
+      return `
+        <div class="step-label">3-D &middot; 대시보드</div>
+        <div class="tip-box">💡 <strong>Streamlit이 뭔가요?</strong> — Python으로 만드는 <strong>웹 대시보드 도구</strong>입니다. 여러분이 직접 코딩하는 게 아니라, Claude Code에게 "만들어줘" 하면 자동으로 코드를 작성하고 실행해줍니다. 브라우저에서 그래프와 표를 볼 수 있어요!</div>
+        <p class="step-desc">Streamlit 대시보드 자동 생성.${tip('Python + Streamlit으로 웹 대시보드를 자동 생성. 브라우저에서 바로 확인 가능')}</p>
+        ${codeBlock('이 데이터로 Streamlit 대시보드 만들어줘','text')}
+        ${successBox('브라우저가 자동으로 열리고 대시보드가 보이면 성공!')}
+        <div class="tip-box">💡 <strong>localhost:8501</strong>이 뭔가요? — "내 컴퓨터 안에서 돌아가는 웹페이지 주소"입니다. 브라우저에 자동으로 열리니 그냥 보시면 됩니다.</div>
+      `;
+    }
+  },
+  {
+    id:'3-E', section:'실습', title:'Action Item',
+    preview() {
+      return fileMock('action_items.md', [
+        {type:'h2',text:'## Action Items'},
+        {type:'line',text:''},
+        {type:'bold',text:'| 담당자  | 항목              | 기한      | 상태   |'},
+        {type:'line',text:'|--------|-------------------|-----------|--------|'},
+        {type:'line',text:'| 김팀장 | QBR 대상 선정     | 5/23(금)  | 진행중 |'},
+        {type:'line',text:'| 이대리 | 파트너 계약서 검토 | 5/21(수)  | 대기   |'},
+        {type:'line',text:'| 박사원 | 매출 데이터 정리   | 5/20(화)  | 완료   |'},
+      ]);
+    },
+    content() {
+      return `
+        <div class="step-label">3-E &middot; Action Item</div>
+        <p class="step-desc">회의록 &rarr; 액션아이템 자동 추출.${tip('회의록 텍스트/파일을 주면 담당자, 기한, 항목을 자동으로 뽑아줌')}</p>
+        ${codeBlock('회의록에서 Action Item 뽑아서 표로 정리해줘','text')}
+        ${successBox('담당자/항목/기한/상태 표가 생성되면 성공')}
+      `;
+    }
+  },
+  {
+    id:'3-F', section:'실습', title:'Dooray 태스크 조회',
+    preview() {
+      return doorayListMock([
+        {title:'5월 정산 처리', status:'진행중', tag:'tag-prog'},
+        {title:'파트너 계약서 검토', status:'등록', tag:'tag-open'},
+        {title:'QBR 자료 준비', status:'등록', tag:'tag-open'},
+        {title:'4월 세금계산서 확인', status:'완료', tag:'tag-done'},
+      ]);
+    },
+    content() {
+      return `
+        <div class="step-label">3-F &middot; Dooray 태스크 조회</div>
+        <div class="result-box fail"><span class="result-icon">⚠️</span><strong>교육 중 주의:</strong> 태스크 조회는 시간과 토큰을 많이 소비합니다. 교육 실습 중에는 건너뛰고 교육 후 시도해주세요.</div>
+        <p class="step-desc">내 태스크/프로젝트 조회.${tip('Dooray MCP가 설치되어 있어야 동작함 (1-G 단계)')}</p>
+        ${codeBlock('내 두레이 태스크 보여줘','text')}
+        ${successBox('태스크 목록이 표시되면 성공')}
+      `;
+    }
+  },
+  {
+    id:'3-G', section:'실습', title:'Dooray 태스크 생성',
+    preview() {
+      return `<div class="dooray-mock">
+        <div class="dooray-mock-bar">&#x2705; 태스크 생성 완료</div>
+        <div class="dooray-mock-body">
+          <div class="dooray-field"><span class="df-label">제목</span><span class="df-value">회의록 정리</span></div>
+          <div class="dooray-field"><span class="df-label">담당자</span><span class="df-value">나</span></div>
+          <div class="dooray-field"><span class="df-label">상태</span><span class="df-value"><span class="dooray-tag tag-open">등록</span></span></div>
+          <div class="dooray-field"><span class="df-label">프로젝트</span><span class="df-value">개인 프로젝트</span></div>
+        </div>
+      </div>`;
+    },
+    content() {
+      return `
+        <div class="step-label">3-G &middot; Dooray 태스크 생성</div>
+        <p class="step-desc">자연어로 태스크 생성. 프로젝트를 지정하지 않으면 기본 프로젝트에 생성됩니다.</p>
+        ${codeBlock('두레이에 "회의록 정리" 태스크 만들어줘','text')}
+        <p class="step-desc" style="margin-top:12px;"><strong>원하는 프로젝트에 생성하려면:</strong></p>
+        ${codeBlock('두레이 프로젝트 4117767563738116439에 "회의록 정리" 태스크 만들어줘','text')}
+        <div class="tip-box">💡 <strong>프로젝트 번호 찾는 법:</strong> Dooray 태스크 URL에서 숫자를 복사<br>
+        <code style="font-size:11px;background:#fff;padding:2px 6px;border-radius:4px;">https://nhnent.dooray.com/task/<strong style="color:#4f46e5">4117767563738116439</strong>/4311902766089083500</code><br>
+        첫 번째 숫자 = 프로젝트 ID, 두 번째 숫자 = 태스크 ID</div>
+        ${successBox('태스크가 생성되면 성공. Dooray 웹에서 확인')}
+      `;
+    }
+  },
+  {
+    id:'3-H', section:'실습', title:'Dooray 댓글/상태',
+    preview() {
+      return `<div class="dooray-mock">
+        <div class="dooray-mock-bar">&#x1F4DD; 태스크 업데이트</div>
+        <div class="dooray-mock-body">
+          <div class="dooray-field"><span class="df-label">제목</span><span class="df-value">회의록 정리</span></div>
+          <div class="dooray-field"><span class="df-label">상태</span><span class="df-value"><span class="dooray-tag tag-open">등록</span> &rarr; <span class="dooray-tag tag-done">완료</span></span></div>
+          <div style="margin-top:8px;padding:8px 12px;background:#f8fafc;border-radius:6px;font-size:11px;border-left:3px solid #4f46e5">
+            <div style="font-weight:600;color:#4f46e5;margin-bottom:2px">새 댓글</div>
+            완료했습니다
+          </div>
+        </div>
+      </div>`;
+    },
+    content() {
+      return `
+        <div class="step-label">3-H &middot; Dooray 댓글/상태</div>
+        <p class="step-desc">댓글 달기, 상태 변경.${tip('한 문장으로 댓글 + 상태변경을 동시에 처리')}</p>
+        ${codeBlock('그 태스크에 "완료했습니다" 댓글 달고 상태를 완료로 변경해줘','text')}
+        ${successBox('댓글 추가 + 상태 변경 완료')}
+      `;
+    }
+  },
+
+  // ── 4. 마무리 ──
+  {
+    id:'4-A', section:'마무리', title:'CLAUDE.md 만들기',
+    preview() {
+      return fileMock('CLAUDE.md', [
+        {type:'h1',text:'# 내 프로젝트 설정'},
+        {type:'line',text:''},
+        {type:'h2',text:'## 나는 누구'},
+        {type:'line',text:'[부서명] [직책]입니다.'},
+        {type:'line',text:''},
+        {type:'h2',text:'## 주요 업무'},
+        {type:'bullet',text:'- 업무 1'},
+        {type:'bullet',text:'- 업무 2'},
+        {type:'line',text:''},
+        {type:'h2',text:'## 규칙'},
+        {type:'bullet',text:'- 항상 한국어로 응답'},
+        {type:'bullet',text:'- 보고서는 마크다운 형식'},
+      ]);
+    },
+    content() {
+      return `
+        <div class="step-label">4-A &middot; CLAUDE.md 만들기</div>
+        <div class="tip-box">💡 <strong>실전 활용의 첫 걸음!</strong> — CLAUDE.md에 "나는 OO팀 OOO이고, 보고서는 항상 한국어로 작성해줘" 같은 내용을 적어두면, 매번 설명하지 않아도 Claude가 기억합니다.</div>
+        <p class="step-desc">내 프로젝트용 설정 파일.${tip('역할, 규칙, 선호도를 적어두면 Claude가 매번 기억함')}</p>
+        ${codeBlock('CLAUDE.md 파일 만들어줘. 나는 [부서명] [이름]이고, [주요 업무]를 담당하고 있어. 보고서는 한국어 마크다운으로 작성해줘.','text')}
+        ${successBox('CLAUDE.md 파일이 생성되면 성공')}
+        <div class="tip-box">💡 <strong>[부서명], [이름], [주요 업무]</strong> 부분을 본인 정보로 바꿔서 입력하세요!</div>
+      `;
+    }
+  },
+  {
+    id:'4-B', section:'마무리', title:'과제 제출',
+    preview() {
+      return `<div class="dooray-mock">
+        <div class="dooray-mock-bar">&#x1F4EE; 과제 제출 태스크</div>
+        <div class="dooray-mock-body">
+          <div class="dooray-field"><span class="df-label">제목</span><span class="df-value">[쉐어클래스] 실습 기록</span></div>
+          <div class="dooray-field"><span class="df-label">내용</span><span class="df-value">체크리스트 + 메모 자동 수집</span></div>
+          <div class="dooray-field"><span class="df-label">프로젝트</span><span class="df-value">개인 프로젝트</span></div>
+          <div style="margin-top:10px;padding:10px;background:#eef2ff;border-radius:6px;font-size:11px;color:#4f46e5;text-align:center;font-weight:600">
+            &#x1F4EE; 과제 제출 버튼 클릭 &rarr; 프롬프트 복사 &rarr; Claude Code에 붙여넣기
+          </div>
+        </div>
+      </div>`;
+    },
+    content() {
+      return `
+        <div class="step-label">4-B &middot; 과제 제출</div>
+        <p class="step-desc">&#x1F4EE; 과제 제출 버튼으로 메모/체크 &rarr; Dooray 태스크 자동 생성${tip('각 단계에서 적은 메모와 체크 상태가 자동으로 수집됨')}</p>
+        ${successBox('우측 하단 &#x1F4EE; 과제 제출 버튼을 클릭하세요')}
+        <div class="tip-box">프롬프트를 복사해서 Claude Code에 붙여넣으면 Dooray 태스크가 자동 생성됩니다.</div>
+      `;
+    }
+  }
+];
+
+// ═══════════════════════════════════════════════════════
+// HELPER FUNCTIONS
+// ═══════════════════════════════════════════════════════
+
+function termMock(lines) {
+  let html = '<div class="term"><div class="term-bar"><div class="term-dot" style="background:#ff5f57"></div><div class="term-dot" style="background:#febc2e"></div><div class="term-dot" style="background:#28c840"></div></div>';
+  lines.forEach(l => {
+    if (l.type === 'prompt') html += '<span class="prompt">' + esc(l.text) + '</span>';
+    else if (l.type === 'cmd') html += '<span class="cmd">' + esc(l.text) + '</span><br>';
+    else if (l.type === 'output') html += (l.text ? '<span class="output">' + esc(l.text) + '</span>' : '') + '<br>';
+    else if (l.type === 'success') html += '<span class="success">' + esc(l.text) + '</span><br>';
+    else if (l.type === 'error') html += '<span class="error">' + esc(l.text) + '</span><br>';
+    else if (l.type === 'comment') html += '<span class="comment">' + esc(l.text) + '</span><br>';
+    else if (l.type === 'highlight') html += '<span class="highlight">' + esc(l.text) + '</span><br>';
+  });
+  html += '</div>';
+  return html;
+}
+
+function fileMock(filename, lines) {
+  let html = '<div class="file-mock"><div class="file-mock-bar">&#x1F4C4; ' + esc(filename) + '</div><div class="file-mock-body">';
+  lines.forEach(l => {
+    if (l.type === 'h1') html += '<div class="line line-h1">' + esc(l.text) + '</div>';
+    else if (l.type === 'h2') html += '<div class="line line-h2">' + esc(l.text) + '</div>';
+    else if (l.type === 'h3') html += '<div class="line line-h3">' + esc(l.text) + '</div>';
+    else if (l.type === 'bold') html += '<div class="line line-bold">' + esc(l.text) + '</div>';
+    else if (l.type === 'dim') html += '<div class="line line-dim">' + esc(l.text) + '</div>';
+    else if (l.type === 'bullet') html += '<div class="line line-bullet">' + esc(l.text) + '</div>';
+    else html += '<div class="line">' + esc(l.text) + '</div>';
+  });
+  html += '</div></div>';
+  return html;
+}
+
+function doorayListMock(tasks) {
+  let html = '<div class="dooray-mock"><div class="dooray-mock-bar">&#x1F4CB; 내 태스크 목록</div><div class="dooray-mock-body">';
+  tasks.forEach(t => {
+    html += '<div class="dooray-field"><span class="df-value">' + esc(t.title) + '</span><span class="dooray-tag ' + t.tag + '">' + esc(t.status) + '</span></div>';
+  });
+  html += '</div></div>';
+  return html;
+}
+
+function codeBlock(code, lang) {
+  const id = 'cb_' + Math.random().toString(36).substring(2,8);
+  return '<div class="code-block"><div class="code-block-header"><span>' + (lang||'') + '</span><button class="code-copy" onclick="copyCode(this,\'' + id + '\')">&#x1F4CB; 복사</button></div><pre id="' + id + '">' + esc(code) + '</pre></div>';
+}
+
+function successBox(text) {
+  return '<div class="result-box success"><span class="result-icon">&#x2705;</span><span>' + text + '</span></div>';
+}
+
+function failBox(text) {
+  return '<div class="result-box fail"><span class="result-icon">&#x274C;</span><span>' + text + '</span></div>';
+}
+
+function tip(text) {
+  return ' <span class="tip-trigger" onclick="this.classList.toggle(\'active\');event.stopPropagation()">?<span class="tip-bubble">' + text + '</span></span>';
+}
+
+function esc(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function copyCode(btn, id) {
+  const pre = document.getElementById(id);
+  if (!pre) return;
+  navigator.clipboard.writeText(pre.textContent).then(() => {
+    btn.classList.add('copied');
+    btn.innerHTML = '&#x2705; 복사됨';
+    setTimeout(() => { btn.classList.remove('copied'); btn.innerHTML = '&#x1F4CB; 복사'; }, 1500);
+  }).catch(() => {
+    // fallback for older browsers or insecure context
+    const ta = document.createElement('textarea');
+    ta.value = pre.textContent;
+    ta.style.cssText = 'position:fixed;opacity:0';
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    btn.classList.add('copied');
+    btn.innerHTML = '&#x2705; 복사됨';
+    setTimeout(() => { btn.classList.remove('copied'); btn.innerHTML = '&#x1F4CB; 복사'; }, 1500);
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// SIDEBAR
+// ═══════════════════════════════════════════════════════
+const SECTIONS = ['안내','준비','이론','실습','마무리'];
+const SECTION_NUMS = {'안내':'0','준비':'1','이론':'2','실습':'3','마무리':'4'};
+
+function buildSidebar() {
+  const sb = document.getElementById('sidebar');
+  let html = '';
+  SECTIONS.forEach(sec => {
+    const items = STEPS.filter(s => s.section === sec);
+    html += '<div class="sb-section">';
+    html += '<div class="sb-title" onclick="toggleSection(this)" data-section="' + sec + '">' + SECTION_NUMS[sec] + '. ' + sec + ' <span class="sb-chevron">&#x25BC;</span></div>';
+    html += '<div class="sb-items" id="sb-items-' + sec + '">';
+    items.forEach(s => {
+      html += '<div class="sb-item" data-id="' + s.id + '" onclick="goToStep(\'' + s.id + '\')">';
+      html += '<span class="sb-label">' + s.id + '</span>';
+      html += '<span class="sb-dot"></span>';
+      html += '<span class="sb-text">' + esc(s.title) + '</span>';
+      html += '</div>';
+    });
+    html += '</div></div>';
+  });
+  sb.innerHTML = html;
+}
+
+function toggleSection(el) {
+  const sec = el.dataset.section;
+  const items = document.getElementById('sb-items-' + sec);
+  el.classList.toggle('collapsed');
+  items.classList.toggle('collapsed');
+}
+
+// ═══════════════════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════════════════
+let currentIndex = 0;
+
+function goToStep(id) {
+  const idx = STEPS.findIndex(s => s.id === id);
+  if (idx >= 0) goToIndex(idx);
+}
+
+function goToIndex(idx) {
+  if (idx < 0 || idx >= STEPS.length) return;
+  currentIndex = idx;
+  const step = STEPS[idx];
+
+  // Update panels
+  document.getElementById('previewPanel').innerHTML = step.preview();
+  document.getElementById('textPanel').innerHTML = step.content() + buildStepTools(step.id);
+
+  // Update header
+  document.getElementById('contentTitle').textContent = step.id + ' \u00B7 ' + step.title;
+  document.getElementById('stepCounter').textContent = (idx+1) + ' / ' + STEPS.length;
+
+  // Update bottom nav
+  document.getElementById('navLabel').textContent = step.id + ' \u00B7 ' + step.title;
+  document.getElementById('navCounter').textContent = (idx+1) + ' / ' + STEPS.length;
+  document.getElementById('btnPrev').disabled = idx === 0;
+  document.getElementById('btnNext').disabled = idx === STEPS.length - 1;
+
+  // Update sidebar active
+  document.querySelectorAll('.sb-item').forEach(el => {
+    el.classList.remove('active');
+    if (el.dataset.id === step.id) el.classList.add('active');
+  });
+
+  // Ensure section is expanded
+  const sec = step.section;
+  const title = document.querySelector('.sb-title[data-section="' + sec + '"]');
+  const items = document.getElementById('sb-items-' + sec);
+  if (title && title.classList.contains('collapsed')) {
+    title.classList.remove('collapsed');
+    items.classList.remove('collapsed');
+  }
+
+  // Scroll sidebar item into view
+  const activeItem = document.querySelector('.sb-item.active');
+  if (activeItem) activeItem.scrollIntoView({block:'nearest'});
+
+  // Load saved state
+  loadStepState(step.id);
+
+  // Update completed states in sidebar
+  updateSidebarCompleted();
+
+  // Scroll text panel to top
+  document.getElementById('textPanel').scrollTop = 0;
+}
+
+function nextStep() { goToIndex(currentIndex + 1); }
+function prevStep() { goToIndex(currentIndex - 1); }
+
+// ═══════════════════════════════════════════════════════
+// STEP TOOLS (checkbox + memo)
+// ═══════════════════════════════════════════════════════
+function buildStepTools(id) {
+  return '<div class="step-tools">'
+    + '<label class="step-check"><input type="checkbox" onchange="saveStepCheck(\'' + id + '\',this.checked)"><span>완료</span></label>'
+    + '<textarea class="step-memo" placeholder="메모..." oninput="saveStepMemo(\'' + id + '\',this.value)"></textarea>'
+    + '</div>';
+}
+
+function saveStepCheck(id, checked) {
+  localStorage.setItem('sc2_' + id + '_check', checked);
+  updateSidebarCompleted();
+}
+
+function saveStepMemo(id, value) {
+  localStorage.setItem('sc2_' + id + '_memo', value);
+}
+
+function loadStepState(id) {
+  const tools = document.querySelector('.step-tools');
+  if (!tools) return;
+  const cb = tools.querySelector('input[type="checkbox"]');
+  const ta = tools.querySelector('textarea');
+  if (cb) cb.checked = localStorage.getItem('sc2_' + id + '_check') === 'true';
+  if (ta) ta.value = localStorage.getItem('sc2_' + id + '_memo') || '';
+}
+
+function updateSidebarCompleted() {
+  document.querySelectorAll('.sb-item').forEach(el => {
+    const id = el.dataset.id;
+    if (localStorage.getItem('sc2_' + id + '_check') === 'true') {
+      el.classList.add('completed');
+    } else {
+      el.classList.remove('completed');
+    }
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// KEYBOARD NAV
+// ═══════════════════════════════════════════════════════
+document.addEventListener('keydown', function(e) {
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+    e.preventDefault();
+    nextStep();
+  }
+  if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+    e.preventDefault();
+    prevStep();
+  }
+});
+
+// ═══════════════════════════════════════════════════════
+// SUBMIT PROMPT
+// ═══════════════════════════════════════════════════════
+function generateSubmitPrompt() {
+  let body = '# 쉐어클래스 실습 기록\n\n';
+  SECTIONS.forEach(sec => {
+    const items = STEPS.filter(s => s.section === sec);
+    let secBody = '';
+    items.forEach(s => {
+      const checked = localStorage.getItem('sc2_' + s.id + '_check') === 'true';
+      const memo = localStorage.getItem('sc2_' + s.id + '_memo') || '';
+      if (checked || memo) {
+        secBody += '### ' + s.id + ' ' + s.title + (checked ? ' \u2705' : '') + '\n';
+        if (memo) secBody += memo + '\n';
+        secBody += '\n';
+      }
+    });
+    if (secBody) {
+      body += '## ' + SECTION_NUMS[sec] + '. ' + sec + '\n\n' + secBody;
+    }
+  });
+
+  const prompt = '\uB450\uB808\uC774 \uB0B4 \uAC1C\uC778 \uD504\uB85C\uC81D\uD2B8\uC5D0 \uD0DC\uC2A4\uD06C\uB97C \uC0DD\uC131\uD574\uC918.\n\n'
+    + '\uC81C\uBAA9: [\uC258\uC5B4\uD074\uB798\uC2A4] \uC2E4\uC2B5 \uAE30\uB85D\n\n'
+    + '\uCC38\uC870\uC790: @\uC815\uC720\uACBD \uD30C\uD2B8\uB108\uC9C0\uC6D0\uD300\n\n'
+    + '\uBCF8\uBB38 (\uB9C8\uD06C\uB2E4\uC6B4):\n```\n' + body + '```';
+
+  const modal = document.createElement('div');
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9000;display:flex;align-items:center;justify-content:center;';
+  modal.innerHTML = '<div style="background:#fff;border-radius:16px;padding:24px;max-width:700px;width:90%;max-height:80vh;overflow-y:auto;">'
+    + '<h3 style="margin:0 0 12px">&#x1F4EE; 과제 제출 프롬프트</h3>'
+    + '<p style="font-size:13px;color:#64748b;margin:0 0 12px">아래 내용을 복사해서 Claude Code에 붙여넣으세요.</p>'
+    + '<pre style="background:#0f172a;color:#e2e8f0;padding:16px;border-radius:8px;font-size:12px;white-space:pre-wrap;max-height:50vh;overflow-y:auto;">' + esc(prompt) + '</pre>'
+    + '<div style="display:flex;gap:8px;margin-top:16px;justify-content:flex-end;">'
+    + '<button onclick="this.closest(\'div[style]\').parentElement.remove()" style="padding:8px 20px;border:1px solid #e2e8f0;background:#fff;border-radius:8px;cursor:pointer;">닫기</button>'
+    + '<button onclick="navigator.clipboard.writeText(this.dataset.prompt);this.textContent=\'\\u2705 복사됨\'" data-prompt="" style="padding:8px 20px;background:#4f46e5;color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:600;">&#x1F4CB; 복사</button>'
+    + '</div></div>';
+  modal.querySelector('[data-prompt]').dataset.prompt = prompt;
+  modal.addEventListener('click', function(e) { if (e.target === modal) modal.remove(); });
+  document.body.appendChild(modal);
+}
+
+// ═══════════════════════════════════════════════════════
+// TOOLTIP CLOSE
+// ═══════════════════════════════════════════════════════
+document.addEventListener('click', function(e) {
+  document.querySelectorAll('.tip-trigger.active').forEach(t => {
+    if (t !== e.target && !t.contains(e.target)) t.classList.remove('active');
+  });
+});
+
+// ═══════════════════════════════════════════════════════
+// RESET ALL PROGRESS
+function resetAllProgress() {
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9000;display:flex;align-items:center;justify-content:center;';
+  overlay.innerHTML = '<div style="background:#fff;border-radius:16px;padding:28px 32px;max-width:380px;width:90%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.3);">'
+    + '<div style="font-size:36px;margin-bottom:12px;">♻️</div>'
+    + '<div style="font-size:16px;font-weight:700;color:#1e293b;margin-bottom:8px;">전체 초기화</div>'
+    + '<div style="font-size:13px;color:#64748b;margin-bottom:20px;line-height:1.6;">모든 체크박스와 메모를 초기화할까요?<br>되돌릴 수 없습니다.</div>'
+    + '<div style="display:flex;gap:8px;justify-content:center;">'
+    + '<button onclick="this.closest(\'div[style]\').parentElement.remove()" style="padding:10px 24px;border:1px solid #e2e8f0;background:#fff;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;font-family:inherit;">취소</button>'
+    + '<button id="resetConfirmBtn" style="padding:10px 24px;background:#ef4444;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;font-family:inherit;">초기화</button>'
+    + '</div></div>';
+  document.body.appendChild(overlay);
+  overlay.addEventListener('click', function(e) { if (e.target === overlay) overlay.remove(); });
+  document.getElementById('resetConfirmBtn').addEventListener('click', function() {
+    STEPS.forEach(s => {
+      localStorage.removeItem('sc2_' + s.id + '_check');
+      localStorage.removeItem('sc2_' + s.id + '_memo');
+    });
+    updateSidebarCompleted();
+    loadStepState(STEPS[currentIndex].id);
+    overlay.remove();
+  });
+}
+
+// SCROLL TOP BUTTON
+// ═══════════════════════════════════════════════════════
+const textPanel = document.getElementById('textPanel');
+if (textPanel) {
+  textPanel.addEventListener('scroll', function() {
+    const btn = document.getElementById('scrollTopBtn');
+    if (this.scrollTop > 200) btn.classList.add('show');
+    else btn.classList.remove('show');
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', function() {
+  buildSidebar();
+  goToIndex(0);
+  updateSidebarCompleted();
+});
+</script>
+
+<!-- ===== 익명 채팅 위젯 (Firebase Firestore) ===== -->
+<style>
+  #chat-btn{position:fixed;right:20px;bottom:20px;z-index:9998;width:56px;height:56px;border-radius:50%;background:#7c3aed;color:#fff;border:0;box-shadow:0 4px 14px rgba(0,0,0,.18);font-size:24px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform .15s}
+  #chat-btn:hover{transform:scale(1.08)}
+  #chat-panel{position:fixed;right:20px;bottom:88px;z-index:9999;width:340px;height:480px;max-height:75vh;background:#fff;border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,.22);display:none;flex-direction:column;overflow:hidden;font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo",sans-serif}
+  #chat-panel.open{display:flex}
+  #chat-head{padding:14px 16px;background:#7c3aed;color:#fff;font-weight:600;display:flex;justify-content:space-between;align-items:center}
+  #chat-head small{display:block;font-weight:400;font-size:11px;opacity:.85;margin-top:2px}
+  #chat-close{background:none;border:0;color:#fff;font-size:20px;cursor:pointer;line-height:1}
+  #chat-msgs{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:6px;background:#f9fafb}
+  .chat-msg{background:#fff;padding:8px 12px;border-radius:10px;max-width:88%;word-break:break-word;font-size:14px;border-left:3px solid #ddd;line-height:1.45}
+  .chat-msg-time{font-size:10px;color:#999;margin-top:4px}
+  #chat-form{display:flex;gap:6px;padding:10px;border-top:1px solid #eee;background:#fff}
+  #chat-input{flex:1;padding:9px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;outline:none}
+  #chat-input:focus{border-color:#7c3aed}
+  #chat-send{padding:9px 14px;background:#7c3aed;color:#fff;border:0;border-radius:8px;cursor:pointer;font-size:14px;font-weight:600}
+  #chat-send:disabled{opacity:.5;cursor:not-allowed}
+  #chat-empty{color:#999;font-size:13px;text-align:center;padding:20px}
+  @media(max-width:480px){#chat-panel{right:10px;left:10px;width:auto;bottom:80px}}
+</style>
+
+<button id="chat-btn" aria-label="익명 채팅 열기" title="익명 채팅">&#x1F4AC;</button>
+<div id="chat-panel" role="dialog" aria-label="익명 채팅창">
+  <div id="chat-head">
+    <div>익명 채팅<small>이름 없이 자유롭게 떠들어요</small></div>
+    <button id="chat-close" aria-label="닫기">&#x2715;</button>
+  </div>
+  <div id="chat-msgs"><div id="chat-empty">아직 메시지가 없어요. 첫 글 남겨보세요.</div></div>
+  <form id="chat-form">
+    <input id="chat-input" type="text" placeholder="하고 싶은 말..." maxlength="500" autocomplete="off" />
+    <button id="chat-send" type="submit">전송</button>
+  </form>
+</div>
+
+<script type="module">
+  const firebaseConfig = {
+    apiKey: "AIzaSyAHZaTopKHKqA530rPl1dNFsQYmRYN4S4M",
+    authDomain: "shareclass-chat.firebaseapp.com",
+    projectId: "shareclass-chat",
+    storageBucket: "shareclass-chat.firebasestorage.app",
+    messagingSenderId: "74045404320",
+    appId: "1:74045404320:web:8c36ca34997aad259e45c5",
+    measurementId: "G-F28LE8GVND"
+  };
+
+  const $btn = document.getElementById("chat-btn");
+  const $panel = document.getElementById("chat-panel");
+  const $close = document.getElementById("chat-close");
+  const $form = document.getElementById("chat-form");
+  const $input = document.getElementById("chat-input");
+  const $msgs = document.getElementById("chat-msgs");
+
+  $close.addEventListener("click", () => $panel.classList.remove("open"));
+  $btn.addEventListener("click", () => $panel.classList.toggle("open"));
+
+  if (firebaseConfig.apiKey === "YOUR_API_KEY") {
+    console.warn("[chat] Firebase config 미설정 — 채팅 버튼 숨김");
+    $btn.style.display = "none";
+  } else {
+    const { initializeApp } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js");
+    const { getFirestore, collection, addDoc, onSnapshot, query, orderBy, limit, serverTimestamp } =
+      await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js");
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const msgsRef = collection(db, "chat-messages");
+
+    const palette = ["#7c3aed","#06b6d4","#10b981","#f59e0b","#ef4444","#ec4899","#3b82f6","#8b5cf6"];
+    const myColor = palette[Math.floor(Math.random() * palette.length)];
+
+    const escape = s => s.replace(/[<>&"']/g, c => ({"<":"&lt;",">":"&gt;","&":"&amp;","\"":"&quot;","'":"&#39;"}[c]));
+    const fmtTime = ts => ts?.toDate ? ts.toDate().toLocaleTimeString("ko-KR",{hour:"2-digit",minute:"2-digit"}) : "";
+
+    $form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const text = $input.value.trim();
+      if (!text) return;
+      $input.value = "";
+      try {
+        await addDoc(msgsRef, { text, color: myColor, createdAt: serverTimestamp() });
+      } catch (err) {
+        console.error("[chat] send failed:", err);
+        alert("전송 실패: " + err.message);
+      }
+    });
+
+    const q = query(msgsRef, orderBy("createdAt", "desc"), limit(100));
+    onSnapshot(q, (snap) => {
+      if (snap.empty) {
+        $msgs.innerHTML = '<div id="chat-empty">아직 메시지가 없어요. 첫 글 남겨보세요.</div>';
+        return;
+      }
+      const items = [];
+      snap.forEach(d => items.push(d.data()));
+      items.reverse();
+      $msgs.innerHTML = items.map(m =>
+        `<div class="chat-msg" style="border-left-color:${m.color || "#ddd"}">${escape(m.text || "")}<div class="chat-msg-time">${fmtTime(m.createdAt)}</div></div>`
+      ).join("");
+      $msgs.scrollTop = $msgs.scrollHeight;
+    }, (err) => {
+      console.error("[chat] subscribe failed:", err);
+      $msgs.innerHTML = `<div id="chat-empty">채팅을 불러오지 못했어요.<br>(${escape(err.code || "error")})</div>`;
+    });
+  }
+</script>
+</body>
+</html>
