@@ -1386,9 +1386,9 @@ const urlParams = new URLSearchParams(window.location.search);
 const courseMode = urlParams.get('course') || 'basic';
 
 if (courseMode === 'intro') {
-  // 실습 섹션 전체 + 과제 제출(4-B) 제거
+  // 실습(3) + 마무리(4) 섹션 전체 제거
   for (let i = STEPS.length - 1; i >= 0; i--) {
-    if (STEPS[i].section === '실습' || STEPS[i].id === '4-B') {
+    if (STEPS[i].section === '실습' || STEPS[i].section === '마무리') {
       STEPS.splice(i, 1);
     }
   }
@@ -1494,7 +1494,7 @@ function copyCode(btn, id) {
 // SIDEBAR
 // ═══════════════════════════════════════════════════════
 const SECTIONS = courseMode === 'intro'
-  ? ['안내','준비','이론','마무리']
+  ? ['안내','준비','이론']
   : ['안내','준비','이론','실습','마무리'];
 const SECTION_NUMS = {'안내':'0','준비':'1','이론':'2','실습':'3','마무리':'4'};
 
