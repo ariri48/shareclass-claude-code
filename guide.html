@@ -406,8 +406,8 @@ const STEPS = [
         <p class="step-desc" style="font-weight:700;margin-bottom:4px;">Q. 코딩을 전혀 몰라도 되나요?</p>
         <p class="step-desc" style="color:#475569;">네! 오늘 교육은 비개발자를 위해 설계되었습니다. "매출 분석해줘", "보고서 만들어줘" 같이 <strong>한국어로 얘기</strong>하면 AI가 알아서 처리합니다.</p>
 
-        <p class="step-desc" style="font-weight:700;margin-top:16px;margin-bottom:4px;">Q. Node.js, Python이 뭔가요? 왜 설치하나요?</p>
-        <p class="step-desc" style="color:#475569;"><strong>Node.js</strong>는 Claude Code를 실행하는 데 필요한 "엔진"입니다. 자동차에 엔진이 필요하듯, Claude Code에 Node.js가 필요합니다. <strong>Python</strong>은 엑셀 자동화, 대시보드 만들기 등 실습에 필요합니다. <strong>둘 다 설치만 하면 직접 다루실 일은 없습니다.</strong></p>
+        <p class="step-desc" style="font-weight:700;margin-top:16px;margin-bottom:4px;">Q. Node.js, Python이 뭔가요?</p>
+        <p class="step-desc" style="color:#475569;">예전엔 Node.js를 따로 설치해야 했지만, 이제는 <strong>Claude Code 설치 명령어가 필요한 것을 알아서 다 설치</strong>합니다. <strong>Python</strong>은 엑셀 자동화, 대시보드 만들기 등 실습에 필요한데, 이것도 Claude Code 안에서 설치를 시키면 됩니다.</p>
 
         <p class="step-desc" style="font-weight:700;margin-top:16px;margin-bottom:4px;">Q. 설치가 안 되면 어떡하나요?</p>
         <p class="step-desc" style="color:#475569;">손을 들어주세요! 보조강사가 도와드립니다. 또는 에러 메시지 전체를 <a href="https://claude.ai" target="_blank" style="color:#4f46e5;font-weight:600;">claude.ai</a>에 붙여넣으면 해결 방법을 알려줍니다.</p>
@@ -419,7 +419,7 @@ const STEPS = [
         <p class="step-desc" style="color:#475569;">컴퓨터에 글자로 명령을 내리는 <strong>검은 화면</strong>입니다. Windows에서는 <strong>"PowerShell"을 검색</strong>해서 열어주세요. (cmd도 있지만, 이 교육에서는 <strong>PowerShell을 기준</strong>으로 안내합니다.)</p>
 
         <p class="step-desc" style="font-weight:700;margin-top:16px;margin-bottom:4px;">Q. npm이 뭔가요?</p>
-        <p class="step-desc" style="color:#475569;">Node.js를 설치하면 자동으로 같이 설치되는 <strong>"프로그램 설치 도구"</strong>입니다. 앱스토어에서 앱을 설치하듯, npm으로 Claude Code를 설치합니다. 따로 설치할 필요 없습니다.</p>
+        <p class="step-desc" style="color:#475569;">Node.js에 포함된 프로그램 설치 도구입니다. 예전에는 <code>npm install</code>로 Claude Code를 설치했지만, <strong>지금은 공식 설치 스크립트를 사용</strong>하므로 npm을 직접 쓸 일이 없습니다.</p>
 
         <p class="step-desc" style="font-weight:700;margin-top:16px;margin-bottom:4px;">Q. 회사 보안 프로그램 때문에 설치가 안 돼요</p>
         <p class="step-desc" style="color:#475569;">사내 보안 정책으로 차단될 수 있습니다. 보조강사에게 알려주시면 <strong>관리자 권한 실행</strong> 또는 <strong>보안 예외 등록</strong>을 도와드립니다.</p>
@@ -434,57 +434,34 @@ const STEPS = [
 
   // ── 1. 준비 ──
   {
-    id:'1-A', section:'준비', title:'Node.js 설치',
+    id:'1-A', section:'준비', title:'Claude Code 설치',
     preview() {
       return termMock([
         {type:'prompt',text:'$ '},
-        {type:'cmd',text:'node -v'},
-        {type:'output',text:'v24.13.0'},
-        {type:'comment',text:'# Node.js 정상 설치 확인'}
+        {type:'cmd',text:'irm https://claude.ai/install.ps1 | iex'},
+        {type:'output',text:'Installing Claude Code...'},
+        {type:'success',text:'✓ Claude Code installed successfully'}
       ]);
     },
     content() {
       return `
-        <div class="step-label">1-A &middot; Node.js 설치</div>
-        <div class="tip-box">💡 <strong>Node.js가 뭔가요?</strong> — Claude Code를 실행하기 위한 "엔진"입니다. 자동차에 엔진이 필요하듯, Claude Code에 Node.js가 필요합니다. <strong>설치만 하면 직접 다루실 일은 없습니다.</strong></div>
-        <p class="step-desc">Claude Code 실행에 필요합니다. 유일하게 직접 설치하는 것.${tip('나머지는 전부 Claude가 설치해줌')}</p>
-        <p class="step-desc"><strong>설치 방법:</strong></p>
-        <div style="display:flex;flex-direction:column;gap:8px;margin:8px 0;">
-          <div class="result-box success"><span class="result-icon">1️⃣</span> <a href="https://nodejs.org" target="_blank" style="color:#065f46;font-weight:600;">nodejs.org</a> 사이트에 접속</div>
-          <div class="result-box success"><span class="result-icon">2️⃣</span> <strong>초록색 "LTS" 버튼</strong>을 클릭하세요 (왼쪽 큰 버튼). "Current"가 아닌 <strong>LTS</strong>를 선택!</div>
-          <div class="result-box success"><span class="result-icon">3️⃣</span> 다운로드된 파일(.msi) 실행 → <strong>"Next" 계속 클릭</strong> → 완료</div>
-          <div class="result-box success"><span class="result-icon">4️⃣</span> 설치 후 터미널을 <strong>새로 열어서</strong> 아래 명령어 입력</div>
-        </div>
-        ${codeBlock('node -v','bash')}
-        ${successBox('v18 이상 버전이 표시되면 성공 (예: v24.13.0)')}
-        ${failBox('버전이 안 나오면: 터미널을 닫고 다시 열어보세요. 그래도 안 되면 nodejs.org에서 재설치')}
+        <div class="step-label">1-A &middot; Claude Code 설치</div>
+        <div class="tip-box">💡 예전엔 Node.js·npm을 따로 깔았지만, 이제는 <strong>Claude Code가 알아서 다 설치</strong>합니다. 아래에서 <strong>내 OS 줄만 복사</strong>하세요. <span style="color:#be123c;">(⚠️ 옛날 <code>npm install</code> 방식은 이제 안 씁니다)</span></div>
+        <p class="step-desc"><strong>내 OS에 맞는 명령어를 터미널에 복사 붙여넣기</strong>하세요.${tip('Ctrl+V로 붙여넣기. 터미널에서는 마우스 우클릭으로도 붙여넣기 가능')}</p>
+        <p class="step-desc" style="font-weight:700;margin-top:12px;">🪟 Windows (PowerShell):</p>
+        ${codeBlock('irm https://claude.ai/install.ps1 | iex','bash')}
+        <p class="step-desc" style="font-weight:700;margin-top:12px;">🍎 Mac / Linux (터미널):</p>
+        ${codeBlock('curl -fsSL https://claude.ai/install.sh | bash','bash')}
+        <p class="step-desc" style="margin-top:12px;"><strong>설치 확인:</strong></p>
+        ${codeBlock('claude --version','bash')}
+        ${successBox('버전 번호가 표시되면 성공 (예: 2.1.x)')}
+        ${failBox('버전이 안 나오면: 터미널을 닫고 다시 열어보세요. 그래도 안 되면 설치 명령어 재실행')}
         <div class="tip-box">💡 <strong>터미널 여는 법:</strong> Windows 시작 버튼 옆 검색창에 <strong>"PowerShell"</strong> 입력 → 클릭. 파란 화면이 터미널입니다. 이 교육에서는 PowerShell을 기준으로 안내합니다.</div>
       `;
     }
   },
   {
-    id:'1-B', section:'준비', title:'Claude Code 설치',
-    preview() {
-      return termMock([
-        {type:'prompt',text:'$ '},
-        {type:'cmd',text:'npm install -g @anthropic-ai/claude-code'},
-        {type:'output',text:'added 1 package in 12s'},
-        {type:'success',text:'✓ claude-code installed successfully'}
-      ]);
-    },
-    content() {
-      return `
-        <div class="step-label">1-B &middot; Claude Code 설치</div>
-        <div class="tip-box">💡 <strong>npm이 뭔가요?</strong> — Node.js를 설치하면 자동으로 같이 설치되는 <strong>"프로그램 설치 도구"</strong>입니다. 앱스토어에서 앱을 다운받듯, npm으로 Claude Code를 설치합니다.</div>
-        <p class="step-desc">아래 명령어를 <strong>터미널에 복사 붙여넣기</strong>하세요.${tip('Ctrl+V로 붙여넣기. 터미널에서는 마우스 우클릭으로도 붙여넣기 가능')}</p>
-        ${codeBlock('npm install -g @anthropic-ai/claude-code','bash')}
-        ${successBox('added 1 package 메시지 나오면 성공')}
-        <div class="tip-box">💡 <strong>복사 붙여넣기 팁:</strong> 위 검은 박스의 <strong>"📋 복사" 버튼</strong>을 클릭 → 터미널에서 <strong>Ctrl+V</strong> (또는 마우스 우클릭) → Enter</div>
-      `;
-    }
-  },
-  {
-    id:'1-C', section:'준비', title:'첫 로그인',
+    id:'1-B', section:'준비', title:'첫 로그인',
     preview() {
       return termMock([
         {type:'prompt',text:'$ '},
@@ -497,7 +474,7 @@ const STEPS = [
     },
     content() {
       return `
-        <div class="step-label">1-C &middot; 첫 로그인</div>
+        <div class="step-label">1-B &middot; 첫 로그인</div>
         <p class="step-desc">터미널에 <strong>claude</strong> 한 단어만 입력하면 브라우저가 자동으로 열립니다.${tip('Google 계정으로 가능. 회사 이메일 or 개인 이메일 모두 OK')}</p>
         ${codeBlock('claude','bash')}
         <div style="display:flex;flex-direction:column;gap:6px;margin:8px 0;">
@@ -511,7 +488,7 @@ const STEPS = [
     }
   },
   {
-    id:'1-D', section:'준비', title:'첫 대화',
+    id:'1-C', section:'준비', title:'첫 대화',
     preview() {
       return termMock([
         {type:'prompt',text:'> '},
@@ -524,7 +501,7 @@ const STEPS = [
     },
     content() {
       return `
-        <div class="step-label">1-D &middot; 첫 대화</div>
+        <div class="step-label">1-C &middot; 첫 대화</div>
         <div class="tip-box">💡 <strong>지금부터가 핵심!</strong> — 터미널에 <strong>></strong> 표시가 나오면, 그 뒤에 한국어로 자유롭게 입력하면 됩니다. 코드가 아니라 <strong>일상 대화</strong>처럼 쓰면 됩니다.</div>
         <p class="step-desc">응답 오면 성공! 이제 나머지는 Claude에게 시키면 됩니다.${tip('claude 입력 후 나오는 > 프롬프트에서 자연어로 대화')}</p>
         ${codeBlock('안녕하세요','text')}
@@ -533,7 +510,7 @@ const STEPS = [
     }
   },
   {
-    id:'1-D2', section:'준비', title:'작업 폴더 만들기',
+    id:'1-D', section:'준비', title:'작업 폴더 만들기',
     preview() {
       return `<div style="width:100%;background:#0f172a;border-radius:10px;padding:16px;font-family:monospace;font-size:12px;color:#e2e8f0;line-height:1.9;">
         <div style="color:#94a3b8;margin-bottom:6px;"># 추천 폴더 구조</div>
@@ -547,7 +524,7 @@ const STEPS = [
     },
     content() {
       return `
-        <div class="step-label">1-D2 &middot; 작업 폴더 만들기</div>
+        <div class="step-label">1-D &middot; 작업 폴더 만들기</div>
         <div class="tip-box">💡 <strong>AI를 본격적으로 쓰기 전에!</strong> — Claude Code는 <strong>"켠 폴더"와 그 안쪽만 볼 수 있어요.</strong> 그 폴더가 곧 Claude의 작업실입니다. 그래서 폴더를 어떻게 두고 켜느냐가 처음부터 중요해요.</div>
 
         <p class="step-desc"><strong>❌ 하지 말 것</strong></p>
@@ -835,13 +812,13 @@ const STEPS = [
     preview() {
       return `<div class="term" style="width:100%">
         <div class="term-bar"><div class="term-dot" style="background:#f87171"></div><div class="term-dot" style="background:#fbbf24"></div><div class="term-dot" style="background:#4ade80"></div></div>
-        <div class="error">npm ERR! code EACCES</div>
-        <div class="error">permission denied, access '/usr/local/lib'</div>
+        <div class="error">command not found: claude</div>
+        <div class="error">또는 실행 정책 오류</div>
         <div class="output" style="margin-top:12px">────────────────</div>
         <div class="comment" style="margin-top:8px"># 에러 메시지를 전부 복사해서</div>
         <div class="comment"># claude.ai 웹에 붙여넣기!</div>
         <div class="output" style="margin-top:12px">────────────────</div>
-        <div class="success" style="margin-top:8px">Claude: "관리자 권한으로 다시 실행해보세요."</div>
+        <div class="success" style="margin-top:8px">Claude: "터미널을 닫고 다시 열어보세요."</div>
         <div class="success">→ 문제 해결!</div>
       </div>`;
     },
@@ -850,7 +827,7 @@ const STEPS = [
         <div class="step-label">1-H &middot; 설치 트러블슈팅</div>
         <p class="step-desc">설치 중 에러가 나면 당황하지 마세요. <strong>에러 메시지 전체를 복사</strong>해서 해결하면 됩니다.</p>
         <div style="background:#0f172a;border-radius:10px;padding:16px;margin:12px 0;">
-          <div style="color:#f87171;font-size:13px;font-family:monospace;margin-bottom:8px;">npm ERR! code EACCES<br>permission denied...</div>
+          <div style="color:#f87171;font-size:13px;font-family:monospace;margin-bottom:8px;">command not found: claude<br>또는 실행 정책 오류...</div>
           <div style="color:#fbbf24;font-size:13px;">↓ 전부 드래그해서 복사</div>
         </div>
         <p class="step-desc" style="margin-top:12px;"><strong>해결 방법 (택 1):</strong></p>
