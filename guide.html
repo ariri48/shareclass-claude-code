@@ -445,7 +445,7 @@ const STEPS = [
     },
     content() {
       return `
-        <div class="step-label">1-A &middot; Claude Code 설치</div>
+        <div class="step-label">1-A &middot; Claude Code 설치 ${slideRef('install','슬라이드 STEP 2')}</div>
         <div class="tip-box">💡 예전엔 Node.js·npm을 따로 깔았지만, 이제는 <strong>Claude Code가 알아서 다 설치</strong>합니다. 아래에서 <strong>내 OS 줄만 복사</strong>하세요. <span style="color:#be123c;">(⚠️ 옛날 <code>npm install</code> 방식은 이제 안 씁니다)</span></div>
         <p class="step-desc"><strong>내 OS에 맞는 명령어를 터미널에 복사 붙여넣기</strong>하세요.${tip('Ctrl+V로 붙여넣기. 터미널에서는 마우스 우클릭으로도 붙여넣기 가능')}</p>
         <p class="step-desc" style="font-weight:700;margin-top:12px;">🪟 Windows (PowerShell):</p>
@@ -474,7 +474,7 @@ const STEPS = [
     },
     content() {
       return `
-        <div class="step-label">1-B &middot; 첫 로그인</div>
+        <div class="step-label">1-B &middot; 첫 로그인 ${slideRef('first-run','슬라이드 STEP 3')}</div>
         <p class="step-desc">터미널에 <strong>claude</strong> 한 단어만 입력하면 브라우저가 자동으로 열립니다.${tip('Google 계정으로 가능. 회사 이메일 or 개인 이메일 모두 OK')}</p>
         ${codeBlock('claude','bash')}
         <div style="display:flex;flex-direction:column;gap:6px;margin:8px 0;">
@@ -501,7 +501,7 @@ const STEPS = [
     },
     content() {
       return `
-        <div class="step-label">1-C &middot; 첫 대화</div>
+        <div class="step-label">1-C &middot; 첫 대화 ${slideRef('first-run','슬라이드 STEP 3')}</div>
         <div class="tip-box">💡 <strong>지금부터가 핵심!</strong> — 터미널에 <strong>></strong> 표시가 나오면, 그 뒤에 한국어로 자유롭게 입력하면 됩니다. 코드가 아니라 <strong>일상 대화</strong>처럼 쓰면 됩니다.</div>
         <p class="step-desc">응답 오면 성공! 이제 나머지는 Claude에게 시키면 됩니다.${tip('claude 입력 후 나오는 > 프롬프트에서 자연어로 대화')}</p>
         ${codeBlock('안녕하세요','text')}
@@ -689,7 +689,7 @@ const STEPS = [
     },
     content() {
       return `
-        <div class="step-label">1-G &middot; Dooray MCP 설치</div>
+        <div class="step-label">1-G &middot; Dooray MCP 설치 ${slideRef('dooray-mcp','슬라이드 STEP 5')}</div>
         <div class="tip-box">💡 <strong>이게 뭐예요? 어디에 써요?</strong> — MCP는 Claude Code에 <strong>"두레이 열쇠"를 쥐여주는 플러그인</strong>이에요. 설치하면 두레이 사이트를 직접 열지 않고도 <strong>"내 태스크 보여줘", "그 태스크에 댓글 달아줘"</strong>처럼 한국어로 부탁만 하면 Claude가 두레이 일을 대신 해줍니다.</div>
 
         <p class="step-desc"><strong>🧰 시작 전 준비물 3가지</strong></p>
@@ -824,7 +824,7 @@ const STEPS = [
     },
     content() {
       return `
-        <div class="step-label">1-H &middot; 설치 트러블슈팅</div>
+        <div class="step-label">1-H &middot; 설치 트러블슈팅 ${slideRef('troubleshoot','슬라이드 에러 대응')}</div>
         <p class="step-desc">설치 중 에러가 나면 당황하지 마세요. <strong>에러 메시지 전체를 복사</strong>해서 해결하면 됩니다.</p>
         <div style="background:#0f172a;border-radius:10px;padding:16px;margin:12px 0;">
           <div style="color:#f87171;font-size:13px;font-family:monospace;margin-bottom:8px;">command not found: claude<br>또는 실행 정책 오류...</div>
@@ -854,7 +854,7 @@ const STEPS = [
     },
     content() {
       return `
-        <div class="step-label">1-I &middot; 스킬 설치</div>
+        <div class="step-label">1-I &middot; 스킬 설치 ${slideRef('skills','슬라이드 STEP 4')}</div>
         <div class="tip-box">💡 <strong>스킬이 뭔가요?</strong> — Claude Code에 추가 기능을 넣어주는 <strong>"확장팩"</strong>입니다. 스마트폰에 앱을 깔듯, Claude Code에 스킬을 설치하면 웹 검색, 파일 관리, 자동화 등 더 많은 것을 할 수 있습니다.</div>
         <p class="step-desc">105개 스킬 한번에 설치. <strong>Claude Code 대화창(> 표시) 안에서</strong> 아래 명령어를 입력하세요.${tip('스킬 = Claude Code 확장 기능. 웹 검색, 파일 관리, 자동화 등')}</p>
         ${codeBlock('curl -s https://raw.githubusercontent.com/akillness/oh-my-skills/main/setup-all-skills-prompt.md','text')}
@@ -1004,7 +1004,7 @@ const STEPS = [
     },
     content() {
       return `
-        <div class="step-label">2-D &middot; 제품 비교</div>
+        <div class="step-label">2-D &middot; 제품 비교 ${slideRef('pricing','슬라이드 요금제')}</div>
         <p class="step-desc"><strong>AI 코딩 도구 비교</strong></p>
         <table class="compact-table">
           <tr><th></th><th>Claude Code</th><th>Cursor</th><th>Copilot</th><th>ChatGPT</th></tr>
@@ -1244,7 +1244,7 @@ const STEPS = [
     },
     content() {
       return `
-        <div class="step-label">3-F &middot; Dooray 태스크 조회</div>
+        <div class="step-label">3-F &middot; Dooray 태스크 조회 ${slideRef('mcp-practice','슬라이드 STEP 6')}</div>
         <div class="result-box fail"><span class="result-icon">⚠️</span><strong>교육 중 주의:</strong> 태스크 조회는 시간과 토큰을 많이 소비합니다. 교육 실습 중에는 건너뛰고 교육 후 시도해주세요.</div>
         <p class="step-desc">내 태스크/프로젝트 조회.${tip('Dooray MCP가 설치되어 있어야 동작함 (1-G 단계)')}</p>
         ${codeBlock('내 두레이 태스크 보여줘','text')}
@@ -1439,6 +1439,10 @@ function successBox(text) {
 
 function failBox(text) {
   return '<div class="result-box fail"><span class="result-icon">&#x274C;</span><span>' + text + '</span></div>';
+}
+
+function slideRef(hash, label) {
+  return '<a href="https://ariri48.github.io/claude-training-3rd/%EC%9E%85%EB%AC%B8/#' + hash + '" target="_blank" style="display:inline-flex;align-items:center;gap:4px;margin-left:8px;padding:2px 10px;background:#eef2ff;border:1px solid #c7d2fe;border-radius:999px;font-size:11px;font-weight:600;color:#4f46e5;text-decoration:none;vertical-align:middle;" title="강의 슬라이드에서 보기">📺 ' + label + '</a>';
 }
 
 function tip(text) {
