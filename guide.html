@@ -1304,6 +1304,47 @@ const STEPS = [
     }
   },
 
+  {
+    id:'3-I', section:'실습', title:'보고서 & PPT',
+    preview() {
+      return fileMock('design.md', [
+        {type:'h1',text:'# PPT 규칙'},
+        {type:'line',text:''},
+        {type:'h2',text:'## 폰트'},
+        {type:'bullet',text:'- NanumGothic (본문 11pt, 제목 20pt)'},
+        {type:'line',text:''},
+        {type:'h2',text:'## 색상'},
+        {type:'bullet',text:'- 제목 #191919, 강조 #4f46e5'},
+        {type:'line',text:''},
+        {type:'h2',text:'## 레이아웃'},
+        {type:'bullet',text:'- 한 슬라이드 5줄 이내'},
+        {type:'bullet',text:'- 로고: assets/logo.png 우측 하단'},
+      ]);
+    },
+    content() {
+      return `
+        <div class="step-label">3-I &middot; 보고서 & PPT</div>
+        <div class="tip-box">💡 <strong>design.md가 뭔가요?</strong> — 사내 PPT 템플릿의 <strong>폰트·색상·레이아웃 규칙을 적어둔 파일</strong>입니다. CLAUDE.md가 "내가 누구인지" 알려준다면, design.md는 "문서를 어떤 스타일로 만들지" 알려줍니다.</div>
+
+        <p class="step-desc" style="font-weight:700;margin-bottom:4px;">Step 1. design.md 만들기</p>
+        <p class="step-desc">사내 PPT 템플릿의 규칙을 적어두면, 누가 만들어도 같은 스타일이 나옵니다.</p>
+        ${codeBlock('design.md 파일 만들어줘. PPT 규칙은 이래:\\n- 폰트: NanumGothic (본문 11pt, 제목 20pt Bold)\\n- 색상: 제목 #191919, 강조 #4f46e5\\n- 로고: assets/logo.png 우측 하단\\n- 한 슬라이드에 내용 5줄 이내','text')}
+
+        <p class="step-desc" style="font-weight:700;margin-top:16px;margin-bottom:4px;">Step 2. 보고서 초안 (마크다운)</p>
+        ${codeBlock('매출 분석 결과로 팀장 보고용 보고서 만들어줘','text')}
+        ${successBox('보고서.md 파일이 생성되면 성공')}
+
+        <p class="step-desc" style="font-weight:700;margin-top:16px;margin-bottom:4px;">Step 3. PPT 생성 (python-pptx)</p>
+        ${codeBlock('이 보고서 내용으로 PPT 만들어줘. design.md 규칙 따라서. python-pptx로 .pptx 파일 생성해줘','text')}
+        ${successBox('.pptx 파일이 생성되면 성공 — 더블클릭해서 PowerPoint로 확인')}
+
+        <p class="step-desc" style="font-weight:700;margin-top:16px;margin-bottom:4px;">Step 4. 수정 지시</p>
+        ${codeBlock('3페이지에 월별 매출 추이 차트 추가하고, 표지에 로고 넣어줘','text')}
+        <div class="tip-box">💡 <strong>실무 TIP:</strong> design.md를 한 번 잘 만들어두면, "QBR 보고서 만들어줘", "월간 리뷰 PPT 만들어줘" 할 때마다 <strong>같은 스타일</strong>로 나옵니다. 팀원끼리 공유하면 팀 전체 문서 통일!</div>
+      `;
+    }
+  },
+
   // ── 4. 마무리 ──
   {
     id:'4-A', section:'마무리', title:'CLAUDE.md 만들기',
