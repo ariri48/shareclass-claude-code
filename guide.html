@@ -308,7 +308,7 @@ const STEPS = [
     content() {
       return `
         <div class="step-label">환영합니다!</div>
-        <p class="step-desc" style="font-size:16px;font-weight:700;color:#1e293b;margin-bottom:16px;">설치부터 활용까지, 2시간 완성 실습형 교육</p>
+        <p class="step-desc" style="font-size:16px;font-weight:700;color:#1e293b;margin-bottom:16px;">설치부터 활용까지, 실습형 교육</p>
         <p class="step-desc">코딩 경험이 전혀 없어도 괜찮습니다.<br><strong>한국어로 얘기하면 되는</strong> AI 업무 자동화를 배워봅니다.</p>
         <div style="margin:20px 0;padding:16px;background:linear-gradient(135deg,#eef2ff,#ede9fe);border:1px solid #c7d2fe;border-radius:12px;">
           <div style="font-weight:700;font-size:14px;color:#4338ca;margin-bottom:10px;">📖 오늘 배울 내용</div>
@@ -322,7 +322,10 @@ const STEPS = [
         <div style="margin:16px 0;padding:14px;background:#ecfdf5;border:1px solid #a7f3d0;border-radius:10px;">
           <div style="font-weight:700;font-size:13px;color:#065f46;margin-bottom:6px;">📎 강의 교안 (발표자료)</div>
           <p style="font-size:12px;color:#065f46;margin:0 0 8px;">수업 중 화면에 띄우는 슬라이드 전체를 볼 수 있습니다.</p>
-          <a href="https://ariri48.github.io/claude-training-3rd/%EC%9E%85%EB%AC%B8/#cover" target="_blank" style="display:inline-block;padding:6px 14px;background:#047857;color:#fff;border-radius:6px;font-size:12px;font-weight:600;text-decoration:none;">📺 강의 슬라이드 보기 →</a>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <a href="https://ariri48.github.io/claude-training-3rd/%EC%9E%85%EB%AC%B8/#cover" target="_blank" style="display:inline-block;padding:6px 14px;background:#047857;color:#fff;border-radius:6px;font-size:12px;font-weight:600;text-decoration:none;">📺 입문 슬라이드 보기 →</a>
+            <a href="https://ariri48.github.io/claude-training-3rd/%EA%B8%B0%EC%B4%88/#cover" target="_blank" style="display:inline-block;padding:6px 14px;background:#047857;color:#fff;border-radius:6px;font-size:12px;font-weight:600;text-decoration:none;">📺 기초 슬라이드 보기 →</a>
+          </div>
         </div>
         <div class="tip-box">💡 <strong>이 사이트 처음이라면</strong> — 오른쪽 하단 <strong>"다음 →"</strong> 버튼을 눌러 한 페이지씩 진행하세요. 왼쪽 목록에서 원하는 단계를 클릭해도 됩니다.</div>
       `;
@@ -538,14 +541,11 @@ const STEPS = [
           <div class="result-box success"><span class="result-icon">③</span> Claude Code는 항상 <strong>"그 일의 폴더"에서 켜기</strong></div>
         </div>
 
-        <p class="step-desc" style="margin-top:16px;"><strong>그래서 어떻게 "그 폴더에서" 켜나요?</strong></p>
-        <p class="step-desc">그 폴더 위치에서 터미널을 연 다음 <strong>claude</strong> 를 실행하면 됩니다.</p>
-        <p class="step-desc"><strong>🍎 Mac:</strong> Finder에서 폴더 우클릭 → "폴더에서 새로운 터미널 열기". 또는 터미널에서:</p>
-        ${codeBlock('cd ~/Documents/ai-작업/보고서\nclaude','bash')}
-        <p class="step-desc"><strong>🪟 Windows:</strong> 폴더 안에서 주소창에 cmd 입력 후 Enter. 또는 PowerShell에서:</p>
-        ${codeBlock('cd $HOME\\Documents\\ai-작업\\보고서\nclaude','bash')}
-        <div class="tip-box">💡 지금 어느 폴더에 있는지 보려면 — Mac: <strong>pwd</strong> / Windows: <strong>cd</strong>(단독 입력) → 현재 폴더 경로가 나와요.</div>
-        ${successBox('원하는 폴더에서 claude 가 실행되면 완료')}
+        <p class="step-desc" style="margin-top:16px;"><strong>실제로는 이렇게 하면 됩니다</strong></p>
+        <p class="step-desc">터미널에서 <strong>claude</strong> 만 입력하면 현재 위치에서 바로 시작됩니다. 폴더를 옮기고 싶으면 대화로 시키면 됩니다.</p>
+        ${codeBlock('"보고서 폴더로 이동해줘"\\n"바탕화면에 ai-작업 폴더 만들고 거기서 시작하자"','text')}
+        <div class="tip-box">💡 폴더별로 관리하면 Claude가 관련 파일을 한눈에 파악하고, 이전 대화 맥락도 유지되는 장점이 있습니다. 하지만 처음부터 완벽하게 정리할 필요는 없어요.</div>
+        ${successBox('claude 실행 후 대화로 폴더 이동까지 가능하면 완료')}
 
         <p class="step-desc" style="margin-top:16px;"><strong>🔗 두레이(1-G)와의 관계</strong></p>
         <div class="tip-box">두레이 MCP는 한 번 설치하면 <strong>어느 폴더에서 켜도 동작</strong>해요(설치할 때 절대경로로 등록되니까요). 그러니 작업 폴더는 <strong>"내 파일을 일거리별로 정리"</strong>하는 용도로 쓰면 됩니다. 단, 중요한 자료가 든 폴더에서 켤 때 Claude가 파일을 바꾸기 전 <strong>매번 허용/거부를 물어보니</strong> 잘 보고 누르세요.</div>
@@ -578,7 +578,7 @@ const STEPS = [
         <p class="step-desc"><strong>직접 설치할 필요 없습니다!</strong> Claude Code 안에서 말하면 됩니다.${tip('Claude가 winget 또는 직접 다운로드로 설치해줌')}</p>
         ${codeBlock('Git 설치해줘','text')}
         ${successBox('git version 표시되면 성공')}
-        <div class="result-box fail"><span class="result-icon">⚠️</span><strong>설치 실패 시:</strong> 회사 PC에서는 <strong>관리자 권한</strong>이 필요할 수 있습니다. PowerShell을 <strong>"관리자 권한으로 실행"</strong>한 뒤 다시 시도하거나, 보조강사에게 손 들어주세요.</div>
+        <div class="result-box fail"><span class="result-icon">⚠️</span> 설치 실패 시 — 회사 PC라면 PowerShell을 "관리자 권한으로 실행" 후 재시도하거나, 보조강사에게 손 들어주세요.</div>
         <div class="tip-box">💡 <strong>이 명령은 Claude Code 안에서</strong> 입력하세요 (<strong>></strong> 표시 뒤에). 일반 터미널이 아닙니다!</div>
       `;
     }
@@ -601,12 +601,12 @@ const STEPS = [
         <p class="step-desc">이것도 Claude Code 안에서 한마디면 끝.${tip('실습에서 Streamlit, pandas 등 Python 패키지 필요')}</p>
         ${codeBlock('Python 설치해줘','text')}
         ${successBox('Python 3.x 버전 표시되면 성공')}
-        <div class="result-box fail"><span class="result-icon">⚠️</span><strong>설치 실패 시:</strong> 회사 PC에서는 <strong>관리자 권한</strong>이 필요할 수 있습니다. PowerShell을 <strong>"관리자 권한으로 실행"</strong>한 뒤 다시 시도하거나, 보조강사에게 손 들어주세요.</div>
+        <div class="result-box fail"><span class="result-icon">⚠️</span> 설치 실패 시 — 회사 PC라면 PowerShell을 "관리자 권한으로 실행" 후 재시도하거나, 보조강사에게 손 들어주세요.</div>
       `;
     }
   },
   {
-    id:'1-F2', section:'준비', title:'Git 기초 개념',
+    id:'1-E2', section:'준비', title:'Git 기초 개념',
     preview() {
       return `<div style="width:100%;display:flex;flex-direction:column;gap:12px;">
         <div style="display:flex;gap:10px;">
@@ -630,7 +630,7 @@ const STEPS = [
     },
     content() {
       return `
-        <div class="step-label">1-F2 &middot; Git 기초 개념</div>
+        <div class="step-label">1-E2 &middot; Git 기초 개념</div>
         <div class="tip-box">💡 1-E에서 Git을 설치했는데, <strong>Git이 정확히 뭐고 GitHub는 또 뭔지</strong> 간단히 알아봅니다. 외울 필요 없고, "아 이런 거구나" 정도만 알면 됩니다.</div>
 
         <p class="step-desc" style="font-weight:700;margin-top:14px;">Git vs GitHub</p>
@@ -671,6 +671,70 @@ const STEPS = [
     }
   },
   {
+    id:'1-E3', section:'준비', title:'Git 활용 시나리오',
+    preview() {
+      return `<div style="width:100%;display:flex;flex-direction:column;gap:10px;">
+        <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:12px;display:flex;align-items:center;gap:10px;">
+          <span style="font-size:22px;">💻</span>
+          <div><div style="font-size:12px;font-weight:700;color:#166534;">나만 쓰기</div><div style="font-size:11px;color:#15803d;">Git만 · GitHub 불필요</div></div>
+        </div>
+        <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:12px;display:flex;align-items:center;gap:10px;">
+          <span style="font-size:22px;">👥</span>
+          <div><div style="font-size:12px;font-weight:700;color:#1e40af;">팀에만 공유</div><div style="font-size:11px;color:#2563eb;">Private 레포 · 초대한 사람만</div></div>
+        </div>
+        <div style="background:#fef2f2;border:1px solid #fecaca;border-radius:10px;padding:12px;display:flex;align-items:center;gap:10px;">
+          <span style="font-size:22px;">🌍</span>
+          <div><div style="font-size:12px;font-weight:700;color:#991b1b;">외부에 공개</div><div style="font-size:11px;color:#dc2626;">Public 레포 · 주의 필요</div></div>
+        </div>
+      </div>`;
+    },
+    content() {
+      return `
+        <div class="step-label">1-E3 &middot; Git 활용 시나리오</div>
+        <div class="tip-box">💡 Git을 설치했고 개념도 알겠는데, <strong>나는 어떤 상황에서 쓰게 될까?</strong> 세 가지 시나리오별로 정리합니다.</div>
+
+        <p class="step-desc" style="font-weight:700;margin-top:14px;">💻 시나리오 1: 나만 쓰는 개인 프로젝트</p>
+        <div style="padding:12px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;margin:8px 0;">
+          <p style="font-size:12px;color:#166534;margin:0;line-height:1.7;">
+            Claude Code로 작업하면 Git이 <strong>자동으로 변경 이력을 기록</strong>합니다.<br>
+            GitHub에 안 올리면 <strong>내 컴퓨터에만</strong> 있으니 걱정할 것 없습니다.<br>
+            실수로 파일을 망쳤을 때 <strong>"되돌려줘"</strong> 한마디면 복구됩니다.
+          </p>
+        </div>
+        ${codeBlock('"아까 수정 전으로 되돌려줘"\\n"오늘 변경한 내용 보여줘"','text')}
+
+        <p class="step-desc" style="font-weight:700;margin-top:18px;">👥 시나리오 2: 팀에만 공유 (Private)</p>
+        <div style="padding:12px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;margin:8px 0;">
+          <p style="font-size:12px;color:#1e40af;margin:0;line-height:1.7;">
+            GitHub에 <strong>Private 레포</strong>를 만들면 <strong>초대한 사람만</strong> 볼 수 있습니다.<br>
+            팀원과 파일을 주고받거나, 여러 PC에서 작업할 때 편리합니다.<br>
+            회사 프로젝트는 대부분 이 방식입니다.
+          </p>
+        </div>
+        ${codeBlock('"이 프로젝트를 GitHub Private 레포로 올려줘"\\n"팀원 email@nhn.com 을 초대해줘"','text')}
+
+        <p class="step-desc" style="font-weight:700;margin-top:18px;">🌍 시나리오 3: 외부에 공개 (Public)</p>
+        <div style="padding:12px;background:#fef2f2;border:1px solid #fecaca;border-radius:10px;margin:8px 0;">
+          <p style="font-size:12px;color:#991b1b;margin:0;line-height:1.7;">
+            Public 레포는 <strong>인터넷의 누구나</strong> 볼 수 있습니다.<br>
+            사내 자료, API 키, 비밀번호가 포함된 파일은 <strong>절대 올리면 안 됩니다.</strong><br>
+            오픈소스 프로젝트나 포트폴리오 공개용입니다.
+          </p>
+        </div>
+
+        <p class="step-desc" style="font-weight:700;margin-top:18px;">정리: 어떤 상황에서 뭘 쓰나요?</p>
+        <table class="compact-table">
+          <tr><th>상황</th><th>Git</th><th>GitHub</th><th>공개 범위</th></tr>
+          <tr><td>혼자 작업, 되돌리기만</td><td>O</td><td>불필요</td><td>내 PC만</td></tr>
+          <tr><td>팀원과 공유</td><td>O</td><td>Private</td><td>초대한 사람만</td></tr>
+          <tr><td>외부 공개</td><td>O</td><td>Public</td><td>전체 공개</td></tr>
+        </table>
+
+        <div class="tip-box">💡 <strong>핵심:</strong> Git만 쓰면 내 컴퓨터 밖으로 나가지 않습니다. GitHub에 push해야 비로소 밖으로 나갑니다. 그래서 Claude Code가 push 전에 항상 확인을 물어봅니다.</div>
+      `;
+    }
+  },
+  {
     id:'1-G', section:'준비', title:'Dooray MCP 설치',
     preview() {
       return termMock([
@@ -692,16 +756,15 @@ const STEPS = [
         <div class="step-label">1-G &middot; Dooray MCP 설치</div>
         <div class="tip-box">💡 <strong>이게 뭐예요? 어디에 써요?</strong> — MCP는 Claude Code에 <strong>"두레이 열쇠"를 쥐여주는 플러그인</strong>이에요. 설치하면 두레이 사이트를 직접 열지 않고도 <strong>"내 태스크 보여줘", "그 태스크에 댓글 달아줘"</strong>처럼 한국어로 부탁만 하면 Claude가 두레이 일을 대신 해줍니다.</div>
 
-        <p class="step-desc"><strong>🧰 시작 전 준비물 3가지</strong></p>
+        <p class="step-desc"><strong>🧰 시작 전 준비</strong></p>
         <div style="display:flex;flex-direction:column;gap:6px;margin:8px 0;">
-          <div class="result-box success"><span class="result-icon">✅</span> <strong>Python 3.10 이상</strong> (앞의 1-F 단계에서 설치했어요)</div>
-          <div class="result-box success"><span class="result-icon">✅</span> <strong>Claude Code</strong> 설치 완료</div>
+          <div class="result-box success"><span class="result-icon">✅</span> Python 3.10 이상 + Claude Code 설치 완료 (앞 단계에서 했어요)</div>
           <div class="result-box success"><span class="result-icon">✅</span> <strong>두레이 로그인</strong> 가능 + 토큰 붙여둘 <strong>메모장</strong> 하나 열어두기</div>
         </div>
         <div class="tip-box">⏱️ 천천히 해도 <strong>10분</strong>이면 끝납니다. 막히면 손 드세요!</div>
 
         <p class="step-desc" style="margin-top:16px;"><strong>Step 1. 소스 코드 다운로드</strong></p>
-        <div class="result-box fail"><span class="result-icon">🚨</span><strong>주의:</strong> 아래 명령어는 <strong>일반 PowerShell</strong>에서 실행하세요. Claude Code 대화창(<strong>></strong> 표시)이 아닙니다! Claude Code가 켜져 있다면 <strong>/exit</strong>을 입력해 먼저 나오세요.</div>
+        <div class="result-box fail"><span class="result-icon">🚨</span> 아래 명령어는 일반 PowerShell에서 실행하세요 (Claude Code 대화창이 아님). Claude Code가 켜져 있다면 /exit으로 먼저 나오세요.</div>
         <p class="step-desc">내 문서 폴더로 이동한 뒤 소스를 다운로드합니다. <strong>Documents 폴더 안에 dooray-mcp 폴더가 자동으로 생깁니다.</strong></p>
         ${codeBlock('cd $HOME\\Documents\ngit clone https://github.com/ariri48/dooray-mcp.git\ncd dooray-mcp','powershell')}
         ${successBox('"dooray-mcp" 폴더가 생기고 그 안으로 이동되면 성공')}
@@ -1149,7 +1212,7 @@ const STEPS = [
       return `<div class="term" style="width:100%">
         <div class="term-bar"><div class="term-dot" style="background:#f87171"></div><div class="term-dot" style="background:#fbbf24"></div><div class="term-dot" style="background:#4ade80"></div></div>
         <div class="prompt">Claude Code</div>
-        <div class="output" style="margin-top:8px">> 이 메일 초안들을 Outlook으로 발송해줘</div>
+        <div class="output" style="margin-top:8px">> 메일 초안들을 각 파트너에게 발송해줘</div>
         <div class="output" style="margin-top:10px">메일 발송 스크립트를 생성합니다...</div>
         <div class="output">  ✉ 김파트너 (partner-a@...) → 발송 완료</div>
         <div class="output">  ✉ 이파트너 (partner-b@...) → 발송 완료</div>
@@ -1160,14 +1223,75 @@ const STEPS = [
     content() {
       return `
         <div class="step-label">3-C2 &middot; 대량 메일 발송</div>
-        <p class="step-desc">3-C에서 만든 메일 초안을 <strong>Outlook으로 자동 발송</strong>합니다.</p>
-        <p class="step-desc"><strong>Step 1.</strong> 메일 초안 확인 후 발송 요청</p>
-        ${codeBlock('이 메일 초안들을 Outlook으로 각 파트너에게 발송해줘','text')}
-        <p class="step-desc"><strong>Step 2.</strong> 더 구체적으로 지시하려면</p>
-        ${codeBlock('메일_발송_명단.xlsx의 이메일 주소로\n각 파트너별 정산 금액이 포함된 메일을\nOutlook으로 자동 발송하는 Python 스크립트 만들어줘','text')}
-        <div class="tip-box">💡 <strong>발송 전 꼭 확인:</strong> Claude가 만든 스크립트를 실행하기 전에 <strong>"먼저 1건만 테스트 발송해줘"</strong>라고 요청하세요. 전체 발송은 확인 후!</div>
-        <div class="result-box success"><span class="result-icon">✅</span> Outlook에서 보낸편지함 확인 → 발송 성공</div>
-        <div class="result-box fail"><span class="result-icon">❌</span> Outlook이 안 열려 있으면 실패. Outlook 실행 상태에서 진행하세요.</div>
+        <p class="step-desc">3-C에서 만든 메일 초안을 자동 발송합니다. 환경에 맞는 방법을 선택하세요.</p>
+
+        <div style="display:flex;gap:0;margin:16px 0 0 0">
+          <button onclick="document.getElementById('tab-outlook').style.display='block';document.getElementById('tab-smtp').style.display='none';this.style.background='#4f46e5';this.style.color='#fff';this.nextElementSibling.style.background='#e5e7eb';this.nextElementSibling.style.color='#374151'" style="padding:8px 20px;border:none;border-radius:8px 8px 0 0;font-size:13px;font-weight:600;cursor:pointer;background:#4f46e5;color:#fff">방법 A &middot; Outlook 연동</button>
+          <button onclick="document.getElementById('tab-smtp').style.display='block';document.getElementById('tab-outlook').style.display='none';this.style.background='#4f46e5';this.style.color='#fff';this.previousElementSibling.style.background='#e5e7eb';this.previousElementSibling.style.color='#374151'" style="padding:8px 20px;border:none;border-radius:8px 8px 0 0;font-size:13px;font-weight:600;cursor:pointer;background:#e5e7eb;color:#374151">방법 B &middot; 두레이 SMTP</button>
+        </div>
+
+        <!-- 방법 A: Outlook -->
+        <div id="tab-outlook" style="display:block;border:2px solid #e5e7eb;border-radius:0 8px 8px 8px;padding:16px">
+          <div style="display:inline-block;background:#fef3c7;color:#92400e;font-size:12px;font-weight:600;padding:3px 10px;border-radius:4px;margin-bottom:10px">Windows 전용 &middot; Outlook 설치 필요</div>
+
+          <p class="step-desc"><strong>Step 1.</strong> 메일 초안 확인 후 발송 요청</p>
+          ${codeBlock('이 메일 초안들을 Outlook으로 각 파트너에게 발송해줘','text')}
+
+          <p class="step-desc"><strong>Step 2.</strong> 더 구체적으로 지시하려면</p>
+          ${codeBlock('메일_발송_명단.xlsx의 이메일 주소로\\n각 파트너별 정산 금액이 포함된 메일을\\nOutlook으로 자동 발송하는 Python 스크립트 만들어줘','text')}
+
+          <div class="tip-box">
+            <strong>특징:</strong><br>
+            &bull; Windows + Outlook 데스크톱 앱이 설치되어 있어야 동작<br>
+            &bull; <code>win32com</code> 라이브러리로 Outlook을 직접 제어<br>
+            &bull; 별도 비밀번호 설정 불필요 &mdash; 이미 로그인된 Outlook 계정 사용<br>
+            &bull; 보낸편지함에 발송 이력이 자동으로 남음
+          </div>
+
+          <div class="result-box success"><span class="result-icon">✅</span> Outlook 보낸편지함 확인 &rarr; 발송 성공</div>
+          <div class="result-box fail"><span class="result-icon">❌</span> Outlook이 실행 중이어야 합니다. Mac에서는 사용 불가.</div>
+        </div>
+
+        <!-- 방법 B: 두레이 SMTP -->
+        <div id="tab-smtp" style="display:none;border:2px solid #e5e7eb;border-radius:0 8px 8px 8px;padding:16px">
+          <div style="display:inline-block;background:#dbeafe;color:#1e40af;font-size:12px;font-weight:600;padding:3px 10px;border-radius:4px;margin-bottom:10px">Mac / Windows / Linux &middot; Outlook 불필요</div>
+
+          <p class="step-desc" style="margin-top:8px"><strong>사전 설정: 두레이 IMAP/SMTP 활성화</strong></p>
+          <div class="tip-box" style="background:#f0f4ff;border-left:4px solid #4f46e5">
+            <strong>1단계.</strong> 두레이 접속 &rarr; 좌측 하단 <strong>설정(톱니바퀴)</strong> &rarr; <strong>메일</strong> &rarr; <strong>IMAP</strong> 메뉴<br>
+            <strong>2단계.</strong> <strong>"IMAP 사용 여부"</strong>를 <strong>ON</strong>으로 변경<br>
+            <strong>3단계.</strong> 비밀번호 설정 (두레이 로그인 비밀번호와 별도 &mdash; IMAP 전용 비밀번호)<br><br>
+            <table style="width:100%;font-size:13px;border-collapse:collapse">
+              <tr style="background:#e8ecf3"><td style="padding:6px;font-weight:bold">구분</td><td style="padding:6px">서버</td><td style="padding:6px">포트</td><td style="padding:6px">보안</td></tr>
+              <tr><td style="padding:6px">수신 (IMAP)</td><td style="padding:6px"><code>imap.dooray.com</code></td><td style="padding:6px">993</td><td style="padding:6px">SSL</td></tr>
+              <tr style="background:#f9fafb"><td style="padding:6px">발신 (SMTP)</td><td style="padding:6px"><code>smtp.dooray.com</code></td><td style="padding:6px">465</td><td style="padding:6px">SSL</td></tr>
+            </table>
+            <br><strong>아이디:</strong> 두레이 이메일 주소 (예: <code>name@nhn.com</code>)<br>
+            <strong>비밀번호:</strong> 위 3단계에서 설정한 IMAP 전용 비밀번호
+          </div>
+
+          <p class="step-desc" style="margin-top:16px"><strong>Step 1.</strong> .env 파일에 SMTP 정보 저장</p>
+          ${codeBlock('프로젝트 폴더에 .env 파일을 만들고 아래 내용을 넣어줘\\n\\nSMTP_SERVER=smtp.dooray.com\\nSMTP_PORT=465\\nSMTP_USER=내이메일@nhn.com\\nSMTP_PASSWORD=두레이IMAP비밀번호\\nSENDER_NAME=보낸사람이름','text')}
+
+          <p class="step-desc"><strong>Step 2.</strong> 메일 초안 확인 후 발송 요청</p>
+          ${codeBlock('이 메일 초안들을 두레이 SMTP(.env 설정)로 각 파트너에게 발송해줘','text')}
+
+          <p class="step-desc"><strong>Step 3.</strong> 더 구체적으로 지시하려면</p>
+          ${codeBlock('메일_발송_명단.xlsx의 이메일 주소로\\n각 파트너별 정산 금액이 포함된 메일을\\n두레이 SMTP로 자동 발송하는 Python 스크립트 만들어줘\\n(.env에서 SMTP 설정을 읽어서 사용)','text')}
+
+          <div class="tip-box">
+            <strong>특징:</strong><br>
+            &bull; Python 표준 라이브러리(<code>smtplib</code>, <code>email</code>)만 사용 &rarr; 추가 설치 없음<br>
+            &bull; <code>.env</code>에 비밀번호 저장 &rarr; 코드에 하드코딩 금지<br>
+            &bull; Mac/Windows/Linux 모두 동일하게 동작<br>
+            &bull; Outlook 실행 불필요 &mdash; 터미널에서 바로 발송
+          </div>
+
+          <div class="result-box success"><span class="result-icon">✅</span> 두레이 메일 &rarr; 보낸메일함 확인 &rarr; 발송 성공</div>
+          <div class="result-box fail"><span class="result-icon">❌</span> 실패 시 체크: (1) IMAP 사용이 ON인지 (2) .env 비밀번호가 IMAP 전용 비밀번호인지 (3) 포트 465/SSL 설정이 맞는지</div>
+        </div>
+
+        <div class="tip-box" style="margin-top:16px">💡 <strong>발송 전 꼭 확인:</strong> 어떤 방법이든 Claude가 만든 스크립트를 실행하기 전에 <strong>"먼저 1건만 테스트 발송해줘"</strong>라고 요청하세요. 전체 발송은 확인 후!</div>
       `;
     }
   },
@@ -1347,36 +1471,7 @@ const STEPS = [
 
   // ── 4. 마무리 ──
   {
-    id:'4-A', section:'마무리', title:'CLAUDE.md 만들기',
-    preview() {
-      return fileMock('CLAUDE.md', [
-        {type:'h1',text:'# 내 프로젝트 설정'},
-        {type:'line',text:''},
-        {type:'h2',text:'## 나는 누구'},
-        {type:'line',text:'[부서명] [직책]입니다.'},
-        {type:'line',text:''},
-        {type:'h2',text:'## 주요 업무'},
-        {type:'bullet',text:'- 업무 1'},
-        {type:'bullet',text:'- 업무 2'},
-        {type:'line',text:''},
-        {type:'h2',text:'## 규칙'},
-        {type:'bullet',text:'- 항상 한국어로 응답'},
-        {type:'bullet',text:'- 보고서는 마크다운 형식'},
-      ]);
-    },
-    content() {
-      return `
-        <div class="step-label">4-A &middot; CLAUDE.md 만들기</div>
-        <div class="tip-box">💡 <strong>실전 활용의 첫 걸음!</strong> — CLAUDE.md에 "나는 OO팀 OOO이고, 보고서는 항상 한국어로 작성해줘" 같은 내용을 적어두면, 매번 설명하지 않아도 Claude가 기억합니다.</div>
-        <p class="step-desc">내 프로젝트용 설정 파일.${tip('역할, 규칙, 선호도를 적어두면 Claude가 매번 기억함')}</p>
-        ${codeBlock('CLAUDE.md 파일 만들어줘. 나는 [부서명] [이름]이고, [주요 업무]를 담당하고 있어. 보고서는 한국어 마크다운으로 작성해줘.','text')}
-        ${successBox('CLAUDE.md 파일이 생성되면 성공')}
-        <div class="tip-box">💡 <strong>[부서명], [이름], [주요 업무]</strong> 부분을 본인 정보로 바꿔서 입력하세요!</div>
-      `;
-    }
-  },
-  {
-    id:'4-B', section:'마무리', title:'과제 제출',
+    id:'4-A', section:'마무리', title:'과제 제출',
     preview() {
       return `<div class="dooray-mock">
         <div class="dooray-mock-bar">&#x1F4EE; 과제 제출 태스크</div>
@@ -1392,7 +1487,7 @@ const STEPS = [
     },
     content() {
       return `
-        <div class="step-label">4-B &middot; 과제 제출</div>
+        <div class="step-label">4-A &middot; 과제 제출</div>
         <p class="step-desc">&#x1F4EE; 과제 제출 버튼으로 메모/체크 &rarr; Dooray 태스크 자동 생성${tip('각 단계에서 적은 메모와 체크 상태가 자동으로 수집됨')}</p>
         ${successBox('우측 하단 &#x1F4EE; 과제 제출 버튼을 클릭하세요')}
         <div class="tip-box">프롬프트를 복사해서 Claude Code에 붙여넣으면 Dooray 태스크가 자동 생성됩니다.</div>
