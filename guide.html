@@ -394,7 +394,7 @@ const STEPS = [
         </div>
         <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:12px;">
           <div style="font-size:13px;font-weight:700;color:#4f46e5;">Q. 설치가 안 되면요?</div>
-          <div style="font-size:12px;color:#475569;margin-top:4px;">A. 손 들어주세요! 보조강사가 도와드립니다.</div>
+          <div style="font-size:12px;color:#475569;margin-top:4px;">A. 손 들어주세요! 강사가 도와드립니다.</div>
         </div>
         <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:12px;">
           <div style="font-size:13px;font-weight:700;color:#4f46e5;">Q. 비용이 드나요?</div>
@@ -413,7 +413,7 @@ const STEPS = [
         <p class="step-desc" style="color:#475569;">예전엔 Node.js를 따로 설치해야 했지만, 이제는 <strong>Claude Code 설치 명령어가 필요한 것을 알아서 다 설치</strong>합니다. <strong>Python</strong>은 엑셀 자동화, 대시보드 만들기 등 실습에 필요한데, 이것도 Claude Code 안에서 설치를 시키면 됩니다.</p>
 
         <p class="step-desc" style="font-weight:700;margin-top:16px;margin-bottom:4px;">Q. 설치가 안 되면 어떡하나요?</p>
-        <p class="step-desc" style="color:#475569;">손을 들어주세요! 보조강사가 도와드립니다. 또는 에러 메시지 전체를 <a href="https://claude.ai" target="_blank" style="color:#4f46e5;font-weight:600;">claude.ai</a>에 붙여넣으면 해결 방법을 알려줍니다.</p>
+        <p class="step-desc" style="color:#475569;">손을 들어주세요! 강사가 도와드립니다. 또는 에러 메시지 전체를 <a href="https://claude.ai" target="_blank" style="color:#4f46e5;font-weight:600;">claude.ai</a>에 붙여넣으면 해결 방법을 알려줍니다.</p>
 
         <p class="step-desc" style="font-weight:700;margin-top:16px;margin-bottom:4px;">Q. 비용이 드나요?</p>
         <p class="step-desc" style="color:#475569;">Claude Code를 사용하려면 유료 구독이 필요합니다. <strong>Pro ($20/월)</strong>부터 사용 가능하고, 사용량이 많으면 <strong>Max ($100~200/월)</strong>를 권장합니다.</p>
@@ -425,7 +425,7 @@ const STEPS = [
         <p class="step-desc" style="color:#475569;">Node.js에 포함된 프로그램 설치 도구입니다. 예전에는 <code>npm install</code>로 Claude Code를 설치했지만, <strong>지금은 공식 설치 스크립트를 사용</strong>하므로 npm을 직접 쓸 일이 없습니다.</p>
 
         <p class="step-desc" style="font-weight:700;margin-top:16px;margin-bottom:4px;">Q. 회사 보안 프로그램 때문에 설치가 안 돼요</p>
-        <p class="step-desc" style="color:#475569;">사내 보안 정책으로 차단될 수 있습니다. 보조강사에게 알려주시면 <strong>관리자 권한 실행</strong> 또는 <strong>보안 예외 등록</strong>을 도와드립니다.</p>
+        <p class="step-desc" style="color:#475569;">사내 보안 정책으로 차단될 수 있습니다. 강사에게 알려주시면 <strong>관리자 권한 실행</strong> 또는 <strong>보안 예외 등록</strong>을 도와드립니다.</p>
 
         <p class="step-desc" style="font-weight:700;margin-top:16px;margin-bottom:4px;">Q. 교육 후에도 이 사이트를 볼 수 있나요?</p>
         <p class="step-desc" style="color:#475569;">공개 기간 종료 후에는 접속이 제한됩니다. 필요한 내용은 메모에 남겨두시거나 과제 제출 기능을 활용해주세요.</p>
@@ -601,7 +601,7 @@ const STEPS = [
         <p class="step-desc"><strong>직접 설치할 필요 없습니다!</strong> Claude Code 안에서 말하면 됩니다.${tip('Claude가 winget 또는 직접 다운로드로 설치해줌')}</p>
         ${codeBlock('Git 설치해줘','text')}
         ${successBox('git version 표시되면 성공')}
-        <div class="result-box fail"><span class="result-icon">⚠️</span> 설치 실패 시 — 회사 PC라면 PowerShell을 "관리자 권한으로 실행" 후 재시도하거나, 보조강사에게 손 들어주세요.</div>
+        <div class="result-box fail"><span class="result-icon">⚠️</span><strong>설치 실패 시:</strong> 회사 PC에서는 <strong>관리자 권한</strong>이 필요할 수 있습니다. PowerShell을 <strong>"관리자 권한으로 실행"</strong>한 뒤 다시 시도하거나, 강사에게 손 들어주세요.</div>
         <div class="tip-box">💡 <strong>이 명령은 Claude Code 안에서</strong> 입력하세요 (<strong>></strong> 표시 뒤에). 일반 터미널이 아닙니다!</div>
       `;
     }
@@ -624,7 +624,7 @@ const STEPS = [
         <p class="step-desc">이것도 Claude Code 안에서 한마디면 끝.${tip('실습에서 Streamlit, pandas 등 Python 패키지 필요')}</p>
         ${codeBlock('Python 설치해줘','text')}
         ${successBox('Python 3.x 버전 표시되면 성공')}
-        <div class="result-box fail"><span class="result-icon">⚠️</span> 설치 실패 시 — 회사 PC라면 PowerShell을 "관리자 권한으로 실행" 후 재시도하거나, 보조강사에게 손 들어주세요.</div>
+        <div class="result-box fail"><span class="result-icon">⚠️</span><strong>설치 실패 시:</strong> 회사 PC에서는 <strong>관리자 권한</strong>이 필요할 수 있습니다. PowerShell을 <strong>"관리자 권한으로 실행"</strong>한 뒤 다시 시도하거나, 강사에게 손 들어주세요.</div>
       `;
     }
   },
@@ -1001,9 +1001,35 @@ const STEPS = [
         <div style="display:flex;flex-direction:column;gap:8px;margin:8px 0;">
           <div class="result-box success"><span class="result-icon">1️⃣</span> <a href="https://claude.ai" target="_blank" style="color:#065f46;font-weight:600;">claude.ai</a> (웹)에 에러 메시지 붙여넣기 → 즉시 답변</div>
           <div class="result-box success"><span class="result-icon">2️⃣</span> Claude Code가 이미 설치됐다면 Claude Code에 에러 붙여넣기</div>
-          <div class="result-box success"><span class="result-icon">3️⃣</span> 보조강사에게 손 들기</div>
+          <div class="result-box success"><span class="result-icon">3️⃣</span> 강사에게 손 들기</div>
         </div>
         <div class="tip-box">💡 에러 메시지는 <strong>빨간 글씨 전체</strong>를 복사하세요. 일부만 복사하면 정확한 답을 못 받습니다.</div>
+      `;
+    }
+  },
+  {
+    id:'1-I', section:'준비', title:'스킬 소개 · 찾기 · 설치',
+    preview() {
+      return termMock([
+        {type:'prompt',text:'> '},
+        {type:'cmd',text:'사용 가능한 skill 목록 보여줘'},
+        {type:'output',text:''},
+        {type:'output',text:'내장 스킬 목록:'},
+        {type:'output',text:'  commit, review, simplify ...'},
+        {type:'success',text:'✓ 기본 스킬 사용 가능'}
+      ]);
+    },
+    content() {
+      return `
+        <div class="step-label">1-I &middot; 스킬(Skill) 소개 · 찾기 · 설치</div>
+        <div class="tip-box">💡 <strong>스킬이 뭔가요?</strong> — Claude Code에 추가 기능을 넣어주는 <strong>"확장팩"</strong>입니다. 스마트폰에 앱을 깔듯, Claude Code에 스킬을 설치하면 특정 작업을 일정한 형식으로 빠르게 처리할 수 있습니다.</div>
+        <p class="step-desc"><strong>기본 내장 스킬</strong>은 설치 없이 바로 사용 가능합니다. 자주 쓰는 스킬(commit, review 등)은 이미 들어있어요.${tip('스킬 = Claude Code 확장 기능. 보고서 형식, 자동화 등')}</p>
+        <p class="step-desc"><strong>🔍 내장 스킬 확인:</strong> Claude Code 안에서 이렇게 물어보세요.</p>
+        ${codeBlock('사용 가능한 skill 목록 보여줘','text')}
+        <p class="step-desc"><strong>📦 외부 스킬이 필요할 때:</strong> GitHub에서 필요한 스킬을 찾아 Claude Code에게 설치를 요청하세요.</p>
+        ${codeBlock('이 skill 설치해줘: [GitHub URL]','text')}
+        <div class="tip-box">💡 보안 정책상 외부 스킬 설치 시 <strong>허용 여부를 묻는 창</strong>이 뜰 수 있어요. 출처가 확인된 것만 허용하세요. 오늘 교육에서는 별도 설치 없이 기본 스킬로 진행합니다.</div>
+        ${successBox('skill 목록이 뜨면 확인 완료')}
       `;
     }
   },
