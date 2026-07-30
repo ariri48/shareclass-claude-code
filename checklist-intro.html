@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claude Code 입문 - 따라하기 체크리스트</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Noto Sans KR', sans-serif;
+    background: #f0f2f5;
+    color: #1a1a1a;
+    line-height: 1.7;
+    min-height: 100vh;
+  }
+  .container {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 24px 16px 80px;
+  }
+
+  /* Header */
+  .header {
+    text-align: center;
+    padding: 40px 24px 28px;
+    background: linear-gradient(135deg, #191919 0%, #3a3a3a 100%);
+    border-radius: 20px;
+    margin-bottom: 24px;
+    color: #fff;
+  }
+  .header .course {
+    font-size: 13px;
+    opacity: 0.6;
+    margin-bottom: 6px;
+  }
+  .header h1 {
+    font-size: 26px;
+    font-weight: 900;
+    margin-bottom: 6px;
+    letter-spacing: -0.5px;
+  }
+  .header p {
+    font-size: 14px;
+    opacity: 0.7;
+  }
+
+  /* Progress */
+  .progress-section {
+    background: #fff;
+    border-radius: 16px;
+    padding: 18px 24px;
+    margin-bottom: 24px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  }
+  .progress-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+  .progress-label span { font-size: 14px; font-weight: 500; color: #666; }
+  .progress-label .count { font-size: 20px; font-weight: 900; color: #191919; }
+  .progress-bar {
+    height: 10px;
+    background: #e8e8e8;
+    border-radius: 5px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #191919, #4a4a4a);
+    border-radius: 5px;
+    transition: width 0.4s ease;
+    width: 0%;
+  }
+
+  /* Section */
+  .section {
+    margin-bottom: 20px;
+  }
+  .section-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #999;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 0 4px;
+    margin-bottom: 10px;
+  }
+
+  /* Step card */
+  .step {
+    background: #fff;
+    border-radius: 14px;
+    margin-bottom: 10px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    overflow: hidden;
+    border: 2px solid transparent;
+    transition: all 0.2s;
+  }
+  .step.done {
+    border-color: #191919;
+  }
+  .step.done .step-header {
+    background: #191919;
+    color: #fff;
+  }
+  .step.done .step-num {
+    background: #fff;
+    color: #191919;
+  }
+  .step.done .check-icon::after {
+    content: '✓';
+    color: #fff;
+    font-weight: 900;
+  }
+
+  .step-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 18px;
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.2s;
+  }
+  .step-header:hover { background: #fafafa; }
+  .step.done .step-header:hover { background: #2a2a2a; }
+
+  .step-num {
+    width: 30px;
+    height: 30px;
+    background: #f0f0f0;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 900;
+    font-size: 14px;
+    flex-shrink: 0;
+    transition: all 0.2s;
+  }
+  .step-title {
+    flex: 1;
+    font-size: 15px;
+    font-weight: 600;
+  }
+  .check-icon {
+    width: 24px;
+    height: 24px;
+    border: 2px solid #ddd;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.2s;
+  }
+  .step.done .check-icon {
+    background: #4caf50;
+    border-color: #4caf50;
+  }
+
+  /* Step body */
+  .step-body {
+    display: none;
+    padding: 0 18px 16px;
+  }
+  .step.open .step-body { display: block; }
+
+  .action {
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-bottom: 8px;
+  }
+  .action p {
+    font-size: 13px;
+    color: #555;
+    margin-bottom: 6px;
+  }
+  .action code {
+    display: block;
+    background: #1a1a1a;
+    color: #e8e8e8;
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-family: 'Consolas', 'Monaco', monospace;
+    font-size: 13px;
+    position: relative;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .action .where {
+    font-size: 12px;
+    color: #999;
+    margin-bottom: 4px;
+    font-weight: 600;
+  }
+  .action .result {
+    font-size: 12px;
+    color: #888;
+    margin-top: 6px;
+  }
+
+  .copy-btn {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255,255,255,0.1);
+    border: none;
+    color: #aaa;
+    padding: 3px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 11px;
+    font-family: inherit;
+  }
+  .copy-btn:hover { background: rgba(255,255,255,0.2); color: #fff; }
+
+  .step-note {
+    font-size: 12px;
+    color: #888;
+    padding: 6px 0 0;
+    font-style: italic;
+  }
+
+  /* Guide link at top */
+  .guide-banner {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    padding: 12px 18px;
+    margin-bottom: 24px;
+    text-decoration: none;
+    color: #1a1a1a;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s;
+  }
+  .guide-banner:hover { background: #f8f8f8; transform: translateY(-1px); }
+  .guide-banner .arrow { margin-left: auto; opacity: 0.4; }
+
+  /* Completion */
+  .completion {
+    display: none;
+    text-align: center;
+    padding: 32px 24px;
+    background: linear-gradient(135deg, #191919, #3a3a3a);
+    border-radius: 20px;
+    color: #fff;
+    margin-top: 12px;
+  }
+  .completion.show { display: block; animation: slideUp 0.5s ease; }
+  .completion .emoji { font-size: 40px; margin-bottom: 10px; }
+  .completion h2 { font-size: 22px; font-weight: 900; margin-bottom: 6px; }
+  .completion p { font-size: 14px; opacity: 0.8; }
+
+  .footer {
+    text-align: center;
+    padding: 28px 0 16px;
+    font-size: 12px;
+    color: #aaa;
+  }
+  .footer a { color: #666; text-decoration: none; }
+
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (max-width: 480px) {
+    .header h1 { font-size: 22px; }
+    .step-header { padding: 12px 14px; }
+    .step-body { padding: 0 14px 14px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <div class="course">[AI스쿨] 초보자를 위한 클로드 코드 설치 가이드</div>
+    <h1>따라하기 체크리스트</h1>
+    <p>하나씩 따라하고 체크하세요</p>
+  </div>
+
+  <a class="guide-banner" href="https://ariri48.github.io/shareclass-claude-code/guide.html?course=intro" target="_blank">
+    <span>📖</span>
+    <span>상세 설명이 필요하면 교육 가이드 전체 보기</span>
+    <span class="arrow">&rarr;</span>
+  </a>
+
+  <div class="progress-section">
+    <div class="progress-label">
+      <span>진행률</span>
+      <span class="count" id="progressCount">0 / 15</span>
+    </div>
+    <div class="progress-bar">
+      <div class="progress-fill" id="progressFill"></div>
+    </div>
+  </div>
+
+  <!-- ========== 1. 설치 ========== -->
+  <div class="section">
+    <div class="section-title">Step 1. 설치</div>
+
+    <div class="step open" data-step="1">
+      <div class="step-header" onclick="toggle(this)">
+        <div class="step-num">1</div>
+        <div class="step-title">Claude Code 설치</div>
+        <div class="check-icon" onclick="event.stopPropagation(); check(1)"></div>
+      </div>
+      <div class="step-body">
+        <div class="action">
+          <div class="where">Windows PowerShell</div>
+          <code>irm https://claude.ai/install.ps1 | iex<button class="copy-btn" onclick="copyCmd(this,'irm https://claude.ai/install.ps1 | iex')">복사</button></code>
+        </div>
+        <div class="action">
+          <div class="where">Mac / Linux 터미널</div>
+          <code>curl -fsSL https://claude.ai/install.sh | bash<button class="copy-btn" onclick="copyCmd(this,'curl -fsSL https://claude.ai/install.sh | bash')">복사</button></code>
+        </div>
+        <div class="action">
+          <div class="where">설치 확인</div>
+          <code>claude --version<button class="copy-btn" onclick="copyCmd(this,'claude --version')">복사</button></code>
+          <div class="result">숫자가 나오면 성공</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="step" data-step="2">
+      <div class="step-header" onclick="toggle(this)">
+        <div class="step-num">2</div>
+        <div class="step-title">첫 로그인</div>
+        <div class="check-icon" onclick="event.stopPropagation(); check(2)"></div>
+      </div>
+      <div class="step-body">
+        <div class="action">
+          <div class="where">터미널</div>
+          <code>claude<button class="copy-btn" onclick="copyCmd(this,'claude')">복사</button></code>
+          <div class="result">브라우저가 열리면 Google 계정으로 로그인</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="step" data-step="3">
+      <div class="step-header" onclick="toggle(this)">
+        <div class="step-num">3</div>
+        <div class="step-title">첫 대화 테스트</div>
+        <div class="check-icon" onclick="event.stopPropagation(); check(3)"></div>
+      </div>
+      <div class="step-body">
+        <div class="action">
+          <div class="where">Claude Code &gt; 프롬프트</div>
+          <code>안녕하세요<button class="copy-btn" onclick="copyCmd(this,'안녕하세요')">복사</button></code>
+          <div class="result">Claude가 답하면 성공</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="step" data-step="4">
+      <div class="step-header" onclick="toggle(this)">
+        <div class="step-num">4</div>
+        <div class="step-title">Git 설치</div>
+        <div class="check-icon" onclick="event.stopPropagation(); check(4)"></div>
+      </div>
+      <div class="step-body">
+        <div class="action">
+          <div class="where">Claude Code &gt; 프롬프트</div>
+          <code>Git 설치해줘<button class="copy-btn" onclick="copyCmd(this,'Git 설치해줘')">복사</button></code>
+          <div class="result">Claude가 알아서 설치합니다</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="step" data-step="5">
+      <div class="step-header" onclick="toggle(this)">
+        <div class="step-num">5</div>
+        <div class="step-title">Python 설치</div>
+        <div class="check-icon" onclick="event.stopPropagation(); check(5)"></div>
+      </div>
+      <div class="step-body">
+        <div class="action">
+          <div class="where">Claude Code &gt; 프롬프트</div>
+          <code>Python 설치해줘<button class="copy-btn" onclick="copyCmd(this,'Python 설치해줘')">복사</button></code>
+          <div class="result">Claude가 알아서 설치합니다</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="step" data-step="6">
+      <div class="step-header" onclick="toggle(this)">
+        <div class="step-num">6</div>
+        <div class="step-title">Dooray MCP 소스 다운로드</div>
+        <div class="check-icon" onclick="event.stopPropagation(); check(6)"></div>
+      </div>
+      <div class="step-body">
+        <div class="action">
+          <div class="where">터미널 (Claude Code 아님, 일반 PowerShell/터미널)</div>
+          <code>cd $HOME\Documents
+git clone https://github.com/ariri48/dooray-mcp.git
+cd dooray-mcp<button class="copy-btn" onclick="copyCmd(this,'cd $HOME\\Documents\ngit clone https://github.com/ariri48/dooray-mcp.git\ncd dooray-mcp')">복사</button></code>
+        </div>
+      </div>
+    </div>
+
+    <div class="step" data-step="7">
+      <div class="step-header" onclick="toggle(this)">
+        <div class="step-num">7</div>
+        <div class="step-title">Dooray API 토큰 발급</div>
+        <div class="check-icon" onclick="event.stopPropagation(); check(7)"></div>
+      </div>
+      <div class="step-body">
+        <div class="action">
+          <p><b>두레이 웹</b> &rarr; 좌측 하단 프로필 &rarr; <b>설정</b> &rarr; <b>API 토큰</b> &rarr; <b>새 토큰 발급</b></p>
+          <p style="color:#c62828; font-weight:600;">토큰은 한 번만 보여줍니다. 바로 복사하세요!</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="step" data-step="8">
+      <div class="step-header" onclick="toggle(this)">
+        <div class="step-num">8</div>
+        <div class="step-title">설치 마법사 실행 + 토큰 입력</div>
+        <div class="check-icon" onclick="event.stopPropagation(); check(8)"></div>
+      </div>
+      <div class="step-body">
+        <div class="action">
+          <div class="where">같은 터미널 (dooray-mcp 폴더에서)</div>
+          <code>python setup.py<button class="copy-btn" onclick="copyCmd(this,'python setup.py')">복사</button></code>
+          <div class="result">토큰 물어보면 붙여넣기 &rarr; 테넌트 ID는 Enter(기본값)</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="step" data-step="9">
+      <div class="step-header" onclick="toggle(this)">
+        <div class="step-num">9</div>
+        <div class="step-title">MCP 연결 확인</div>
+        <div class="check-icon" onclick="event.stopPropagation(); check(9)"></div>
+      </div>
+      <div class="step-body">
+        <div class="action">
+          <p>Claude Code를 <b>종료했다가 다시 실행</b>한 후:</p>
+          <div class="where">Claude Code</div>
+          <code>/mcp<button class="copy-btn" onclick="copyCmd(this,'/mcp')">복사</button></code>
+          <div class="result">dooray-mcp가 <b style="color:#2e7d32">connected</b>로 나오면 성공!</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== 2. 실습 ========== -->
+  <div class="section">
+    <div class="section-title">Step 2. 실습</div>
+
+    <div class="step" data-step="10">
+      <div class="step-header" onclick="toggle(this)">
+        <div class="step-num">10</div>
+        <div class="step-title">작업 폴더 만들기 + 실습파일 다운로드</div>
+        <div class="check-icon" onclick="event.stopPropagation(); check(10)"></div>
+      </div>
+      <div class="step-body">
+        <div class="action">
+          <p>바탕화면에 <b>shareclass-실습</b> 폴더를 만들고, 실습 파일 3개를 다운로드하세요.</p>
+          <p>📊 매출_데이터_2026년4월.xlsx<br>📧 메일_발송_명단.xlsx<br>📋 팀원_업무현황.xlsx</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="step" data-step="11">
+      <div class="step-header" onclick="toggle(this)">
+        <div class="step-num">11</div>
+        <div class="step-title">매출 분석</div>
+        <div class="check-icon" onclick="event.stopPropagation(); check(11)"></div>
+      </div>
+      <div class="step-body">
+        <div class="action">
+          <div class="where">실습 폴더에서 Claude Code 실행</div>
+          <code>cd Desktop\shareclass-실습 && claude<button class="copy-btn" onclick="copyCmd(this,'cd Desktop\\shareclass-실습')">복사</button></code>
+        </div>
+        <div class="action">
+          <div class="where">Claude Code &gt; 프롬프트</div>
+          <code>이 엑셀 파일 열어서 팀별 매출 합산하고 순위 매겨줘<button class="copy-btn" onclick="copyCmd(this,'이 엑셀 파일 열어서 팀별 매출 합산하고 순위 매겨줘')">복사</button></code>
+        </div>
+      </div>
+    </div>
+
+    <div class="step" data-step="12">
+      <div class="step-header" onclick="toggle(this)">
+        <div class="step-num">12</div>
+        <div class="step-title">주간보고 만들기</div>
+        <div class="check-icon" onclick="event.stopPropagation(); check(12)"></div>
+      </div>
+      <div class="step-body">
+        <div class="action">
+          <div class="where">Claude Code &gt; 프롬프트</div>
+          <code>매출 분석 결과로 팀장님께 보고할 주간보고 만들어줘<button class="copy-btn" onclick="copyCmd(this,'매출 분석 결과로 팀장님께 보고할 주간보고 만들어줘')">복사</button></code>
+        </div>
+      </div>
+    </div>
+
+    <div class="step" data-step="13">
+      <div class="step-header" onclick="toggle(this)">
+        <div class="step-num">13</div>
+        <div class="step-title">Dooray 태스크 조회</div>
+        <div class="check-icon" onclick="event.stopPropagation(); check(13)"></div>
+      </div>
+      <div class="step-body">
+        <div class="action">
+          <div class="where">Claude Code &gt; 프롬프트</div>
+          <code>내 두레이 태스크 보여줘<button class="copy-btn" onclick="copyCmd(this,'내 두레이 태스크 보여줘')">복사</button></code>
+        </div>
+      </div>
+    </div>
+
+    <div class="step" data-step="14">
+      <div class="step-header" onclick="toggle(this)">
+        <div class="step-num">14</div>
+        <div class="step-title">Dooray 태스크 생성</div>
+        <div class="check-icon" onclick="event.stopPropagation(); check(14)"></div>
+      </div>
+      <div class="step-body">
+        <div class="action">
+          <div class="where">Claude Code &gt; 프롬프트</div>
+          <code>내 개인 프로젝트에 "Claude Code 연결 성공 🎉" 태스크 하나 만들어줘<button class="copy-btn" onclick="copyCmd(this,'내 개인 프로젝트에 "Claude Code 연결 성공 🎉" 태스크 하나 만들어줘')">복사</button></code>
+        </div>
+      </div>
+    </div>
+
+    <div class="step" data-step="15">
+      <div class="step-header" onclick="toggle(this)">
+        <div class="step-num">15</div>
+        <div class="step-title">대시보드 만들기</div>
+        <div class="check-icon" onclick="event.stopPropagation(); check(15)"></div>
+      </div>
+      <div class="step-body">
+        <div class="action">
+          <div class="where">Claude Code &gt; 프롬프트</div>
+          <code>이 데이터로 Streamlit 대시보드 만들어줘<button class="copy-btn" onclick="copyCmd(this,'이 데이터로 Streamlit 대시보드 만들어줘')">복사</button></code>
+          <div class="result">브라우저에서 localhost:8501 열리면 성공</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="completion" id="completionBanner">
+    <div class="emoji">🎉</div>
+    <h2>입문 과정 완료!</h2>
+    <p>기초과정에서 내 업무를 직접 자동화해 보세요.</p>
+  </div>
+
+  <div class="footer">
+    <p>NHN Cloud 파트너지원팀 | <a href="https://ariri48.github.io/shareclass-claude-code/guide.html?course=intro" target="_blank">입문 교육 가이드</a></p>
+  </div>
+</div>
+
+<script>
+const TOTAL = 15;
+const state = {};
+for (let i = 1; i <= TOTAL; i++) state[i] = false;
+
+// Load from localStorage
+const saved = localStorage.getItem('checklist-intro');
+if (saved) {
+  try {
+    const parsed = JSON.parse(saved);
+    Object.keys(parsed).forEach(k => { state[+k] = parsed[k]; });
+    Object.keys(state).forEach(k => {
+      if (state[k]) {
+        const el = document.querySelector(`.step[data-step="${k}"]`);
+        if (el) el.classList.add('done');
+      }
+    });
+    updateProgress();
+  } catch(e) {}
+}
+
+function toggle(header) {
+  header.closest('.step').classList.toggle('open');
+}
+
+function check(step) {
+  state[step] = !state[step];
+  const el = document.querySelector(`.step[data-step="${step}"]`);
+  el.classList.toggle('done', state[step]);
+
+  if (state[step]) {
+    el.classList.remove('open');
+    // open next unchecked
+    const next = step + 1;
+    if (next <= TOTAL && !state[next]) {
+      const nextEl = document.querySelector(`.step[data-step="${next}"]`);
+      if (nextEl) {
+        nextEl.classList.add('open');
+        setTimeout(() => nextEl.scrollIntoView({ behavior: 'smooth', block: 'center' }), 150);
+      }
+    }
+  }
+
+  localStorage.setItem('checklist-intro', JSON.stringify(state));
+  updateProgress();
+}
+
+function updateProgress() {
+  const done = Object.values(state).filter(Boolean).length;
+  document.getElementById('progressCount').textContent = `${done} / ${TOTAL}`;
+  document.getElementById('progressFill').style.width = `${(done / TOTAL) * 100}%`;
+  const banner = document.getElementById('completionBanner');
+  if (done === TOTAL) banner.classList.add('show');
+  else banner.classList.remove('show');
+}
+
+function copyCmd(btn, text) {
+  navigator.clipboard.writeText(text).then(() => {
+    const orig = btn.textContent;
+    btn.textContent = '완료!';
+    setTimeout(() => btn.textContent = orig, 1200);
+  });
+}
+</script>
+</body>
+</html>
