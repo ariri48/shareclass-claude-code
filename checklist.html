@@ -1,0 +1,1011 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claude Code 교육 사전 세팅 체크리스트</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Noto Sans KR', sans-serif;
+    background: #f0f2f5;
+    color: #1a1a1a;
+    line-height: 1.7;
+    min-height: 100vh;
+  }
+
+  .container {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 24px 16px 80px;
+  }
+
+  /* Header */
+  .header {
+    text-align: center;
+    padding: 48px 24px 36px;
+    background: linear-gradient(135deg, #191919 0%, #3a3a3a 100%);
+    border-radius: 20px;
+    margin-bottom: 32px;
+    color: #fff;
+    position: relative;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -30%;
+    width: 300px;
+    height: 300px;
+    background: rgba(255,255,255,0.03);
+    border-radius: 50%;
+  }
+  .header h1 {
+    font-size: 28px;
+    font-weight: 900;
+    margin-bottom: 8px;
+    letter-spacing: -0.5px;
+  }
+  .header p {
+    font-size: 15px;
+    opacity: 0.8;
+    font-weight: 400;
+  }
+  .header .badge {
+    display: inline-block;
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.2);
+    padding: 4px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    margin-top: 12px;
+  }
+
+  /* Progress bar */
+  .progress-section {
+    background: #fff;
+    border-radius: 16px;
+    padding: 20px 24px;
+    margin-bottom: 24px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  }
+  .progress-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  .progress-label span {
+    font-size: 14px;
+    font-weight: 500;
+    color: #666;
+  }
+  .progress-label .count {
+    font-size: 22px;
+    font-weight: 900;
+    color: #191919;
+  }
+  .progress-bar {
+    height: 12px;
+    background: #e8e8e8;
+    border-radius: 6px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #191919, #4a4a4a);
+    border-radius: 6px;
+    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    width: 0%;
+  }
+  .progress-message {
+    text-align: center;
+    margin-top: 12px;
+    font-size: 14px;
+    color: #888;
+    transition: all 0.3s;
+  }
+  .progress-message.done {
+    color: #191919;
+    font-weight: 700;
+    font-size: 16px;
+  }
+
+  /* Check item card */
+  .check-card {
+    background: #fff;
+    border-radius: 16px;
+    margin-bottom: 16px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    overflow: hidden;
+    transition: all 0.3s;
+    border: 2px solid transparent;
+  }
+  .check-card.checked {
+    border-color: #191919;
+  }
+  .check-card.checked .card-header {
+    background: #191919;
+    color: #fff;
+  }
+  .check-card.checked .step-number {
+    background: #fff;
+    color: #191919;
+  }
+  .check-card.checked .status-badge {
+    background: #fff;
+    color: #191919;
+  }
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 18px 20px;
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.3s, color 0.3s;
+  }
+  .card-header:hover {
+    background: #fafafa;
+  }
+  .check-card.checked .card-header:hover {
+    background: #2a2a2a;
+  }
+
+  .step-number {
+    width: 36px;
+    height: 36px;
+    background: #f0f0f0;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 900;
+    font-size: 16px;
+    flex-shrink: 0;
+    transition: all 0.3s;
+  }
+
+  .card-title-area {
+    flex: 1;
+  }
+  .card-title {
+    font-size: 17px;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+  }
+  .card-subtitle {
+    font-size: 13px;
+    opacity: 0.6;
+    margin-top: 2px;
+  }
+
+  .status-badge {
+    padding: 5px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 700;
+    background: #f0f0f0;
+    color: #999;
+    transition: all 0.3s;
+    flex-shrink: 0;
+  }
+  .status-badge.yes {
+    background: #191919;
+    color: #fff;
+  }
+
+  /* Card body */
+  .card-body {
+    padding: 0 20px 20px;
+    display: none;
+  }
+  .check-card.open .card-body {
+    display: block;
+  }
+
+  .how-to-check {
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 16px 18px;
+    margin-bottom: 16px;
+  }
+  .how-to-check h4 {
+    font-size: 13px;
+    font-weight: 700;
+    color: #191919;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .how-to-check code {
+    display: block;
+    background: #1a1a1a;
+    color: #e8e8e8;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-family: 'Consolas', 'Monaco', monospace;
+    font-size: 14px;
+    margin-top: 6px;
+    position: relative;
+  }
+  .how-to-check .result {
+    font-size: 13px;
+    color: #666;
+    margin-top: 8px;
+  }
+
+  .guide-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #fff8e1;
+    border: 1px solid #ffe082;
+    border-radius: 10px;
+    padding: 14px 18px;
+    text-decoration: none;
+    color: #1a1a1a;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s;
+    margin-bottom: 12px;
+  }
+  .guide-link:hover {
+    background: #fff3c4;
+    transform: translateY(-1px);
+  }
+  .guide-link .arrow {
+    margin-left: auto;
+    font-size: 18px;
+    opacity: 0.5;
+  }
+
+  /* Install guide toggle */
+  .install-guide {
+    margin-bottom: 12px;
+  }
+  .install-toggle {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    background: #fff8e1;
+    border: 1px solid #ffe082;
+    border-radius: 10px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    color: #1a1a1a;
+    transition: all 0.2s;
+  }
+  .install-toggle:hover {
+    background: #fff3c4;
+  }
+  .install-toggle .chevron {
+    font-size: 11px;
+    transition: transform 0.3s;
+    color: #999;
+  }
+  .install-guide.open .install-toggle .chevron {
+    transform: rotate(180deg);
+  }
+  .install-content {
+    display: none;
+    padding-top: 12px;
+  }
+  .install-guide.open .install-content {
+    display: block;
+    animation: slideUp 0.3s ease;
+  }
+
+  /* Dooray MCP steps */
+  .mcp-steps {
+    counter-reset: mcp-step;
+  }
+  .mcp-step {
+    position: relative;
+    padding: 16px 18px 16px 52px;
+    background: #f8f9fa;
+    border-radius: 10px;
+    margin-bottom: 10px;
+  }
+  .mcp-step::before {
+    counter-increment: mcp-step;
+    content: counter(mcp-step);
+    position: absolute;
+    left: 16px;
+    top: 16px;
+    width: 26px;
+    height: 26px;
+    background: #191919;
+    color: #fff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+  }
+  .mcp-step h5 {
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+  .mcp-step p {
+    font-size: 13px;
+    color: #555;
+    margin-bottom: 6px;
+  }
+  .mcp-step code {
+    display: block;
+    background: #1a1a1a;
+    color: #e8e8e8;
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-family: 'Consolas', 'Monaco', monospace;
+    font-size: 13px;
+    margin-top: 4px;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .mcp-step .tip {
+    font-size: 12px;
+    color: #888;
+    margin-top: 6px;
+    font-style: italic;
+  }
+
+  /* Toggle buttons */
+  .toggle-area {
+    display: flex;
+    gap: 8px;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid #eee;
+  }
+  .btn-yes, .btn-no {
+    flex: 1;
+    padding: 12px;
+    border-radius: 10px;
+    border: 2px solid #ddd;
+    background: #fff;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: inherit;
+  }
+  .btn-yes:hover {
+    border-color: #191919;
+    background: #f5f5f5;
+  }
+  .btn-no:hover {
+    border-color: #ff6b6b;
+    background: #fff5f5;
+  }
+  .btn-yes.active {
+    background: #191919;
+    color: #fff;
+    border-color: #191919;
+  }
+  .btn-no.active {
+    background: #ff6b6b;
+    color: #fff;
+    border-color: #ff6b6b;
+  }
+
+  /* Completion banner */
+  .completion-banner {
+    display: none;
+    text-align: center;
+    padding: 36px 24px;
+    background: linear-gradient(135deg, #191919, #3a3a3a);
+    border-radius: 20px;
+    color: #fff;
+    margin-top: 8px;
+  }
+  .completion-banner.show {
+    display: block;
+    animation: slideUp 0.5s ease;
+  }
+  .completion-banner h2 {
+    font-size: 24px;
+    font-weight: 900;
+    margin-bottom: 8px;
+  }
+  .completion-banner p {
+    font-size: 15px;
+    opacity: 0.8;
+  }
+  .completion-banner .emoji {
+    font-size: 48px;
+    margin-bottom: 12px;
+  }
+
+  /* Footer */
+  .footer {
+    text-align: center;
+    padding: 32px 0 16px;
+    font-size: 13px;
+    color: #aaa;
+  }
+  .footer a {
+    color: #666;
+    text-decoration: none;
+  }
+  .footer a:hover {
+    text-decoration: underline;
+  }
+
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Copy button */
+  .copy-btn {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255,255,255,0.1);
+    border: none;
+    color: #aaa;
+    padding: 4px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    font-family: inherit;
+    transition: all 0.2s;
+  }
+  .copy-btn:hover {
+    background: rgba(255,255,255,0.2);
+    color: #fff;
+  }
+
+  /* Assignment card */
+  .assignment-card {
+    display: none;
+    background: #fff;
+    border-radius: 20px;
+    margin-top: 16px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    overflow: hidden;
+    border: 2px solid #ffe082;
+  }
+  .assignment-card.show {
+    display: block;
+    animation: slideUp 0.5s ease 0.3s both;
+  }
+  .assignment-header {
+    background: linear-gradient(135deg, #fff8e1, #fff3c4);
+    padding: 24px 24px 18px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .assignment-icon {
+    font-size: 28px;
+    flex-shrink: 0;
+    line-height: 1;
+  }
+  .assignment-header h3 {
+    font-size: 18px;
+    font-weight: 900;
+    color: #191919;
+    letter-spacing: -0.3px;
+    line-height: 1.4;
+  }
+  .assignment-body {
+    padding: 20px 24px 28px;
+  }
+  .assignment-lead {
+    font-size: 15px;
+    color: #333;
+    margin-bottom: 10px;
+    line-height: 1.8;
+  }
+  .assignment-sub {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 20px;
+    line-height: 1.7;
+  }
+  .example-box {
+    background: #f8f9fa;
+    border-radius: 12px;
+    padding: 18px 20px;
+    margin-bottom: 16px;
+  }
+  .example-box h4 {
+    font-size: 14px;
+    font-weight: 700;
+    color: #191919;
+    margin-bottom: 10px;
+  }
+  .example-box ul {
+    list-style: none;
+    padding: 0;
+  }
+  .example-box li {
+    font-size: 14px;
+    color: #555;
+    padding: 5px 0 5px 20px;
+    position: relative;
+    line-height: 1.6;
+  }
+  .example-box li::before {
+    content: '>';
+    position: absolute;
+    left: 0;
+    color: #191919;
+    font-weight: 700;
+  }
+  .file-notice {
+    background: #e8f5e9;
+    border-radius: 10px;
+    padding: 14px 18px;
+    margin-bottom: 14px;
+  }
+  .file-notice strong {
+    font-size: 14px;
+    color: #2e7d32;
+    display: block;
+    margin-bottom: 4px;
+  }
+  .file-notice p {
+    font-size: 13px;
+    color: #555;
+    margin: 0;
+  }
+  .no-task-notice {
+    background: #f5f5f5;
+    border-radius: 10px;
+    padding: 14px 18px;
+    margin-bottom: 20px;
+  }
+  .no-task-notice p {
+    font-size: 13px;
+    color: #666;
+    margin-bottom: 6px;
+    line-height: 1.7;
+  }
+  .no-task-notice .small-warn {
+    font-size: 12px;
+    color: #999;
+    margin-bottom: 0;
+  }
+  .assignment-cta {
+    text-align: center;
+    font-size: 16px;
+    font-weight: 900;
+    color: #191919;
+    padding: 16px;
+    background: linear-gradient(135deg, #f5f5f5, #e8e8e8);
+    border-radius: 12px;
+    letter-spacing: -0.3px;
+  }
+
+  /* Responsive */
+  @media (max-width: 480px) {
+    .header h1 { font-size: 22px; }
+    .card-header { padding: 14px 16px; gap: 10px; }
+    .card-title { font-size: 15px; }
+    .card-body { padding: 0 16px 16px; }
+    .step-number { width: 32px; height: 32px; font-size: 14px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- Header -->
+  <div class="header">
+    <h1>Claude Code 교육</h1>
+    <p>사전 세팅 체크리스트</p>
+    <div class="badge">교육 참석 전 완료해 주세요</div>
+  </div>
+
+  <!-- Progress -->
+  <div class="progress-section">
+    <div class="progress-label">
+      <span>진행률</span>
+      <span class="count" id="progressCount">0 / 4</span>
+    </div>
+    <div class="progress-bar">
+      <div class="progress-fill" id="progressFill"></div>
+    </div>
+    <div class="progress-message" id="progressMessage">아래 항목을 하나씩 확인해 보세요</div>
+  </div>
+
+  <!-- 1. Claude Code -->
+  <div class="check-card open" data-step="1">
+    <div class="card-header" onclick="toggleCard(this)">
+      <div class="step-number">1</div>
+      <div class="card-title-area">
+        <div class="card-title">Claude Code 설치</div>
+        <div class="card-subtitle">터미널에서 AI와 대화하는 도구</div>
+      </div>
+      <div class="status-badge" id="badge-1">확인 전</div>
+    </div>
+    <div class="card-body">
+      <div class="how-to-check">
+        <h4>확인 방법</h4>
+        <p style="font-size:13px; color:#555; margin-bottom:6px;">터미널(PowerShell 또는 터미널)을 열고 아래 명령어를 입력하세요.</p>
+        <code style="position:relative;">claude --version<button class="copy-btn" onclick="copyCmd(this, 'claude --version')">복사</button></code>
+        <div class="result">숫자(예: <b>2.1.x</b>)가 나오면 설치 완료!</div>
+      </div>
+
+      <div class="install-guide">
+        <button class="install-toggle" onclick="toggleInstall(this)">
+          <span>아직 설치 안 했다면? 설치 방법 보기</span>
+          <span class="chevron">&#9660;</span>
+        </button>
+        <div class="install-content">
+          <div class="mcp-steps">
+            <div class="mcp-step">
+              <h5>설치 명령어 실행</h5>
+              <p><b>Windows</b> — PowerShell을 열고 아래를 입력하세요.</p>
+              <code>irm https://claude.ai/install.ps1 | iex</code>
+              <p style="margin-top:10px;"><b>Mac / Linux</b> — 터미널을 열고 아래를 입력하세요.</p>
+              <code>curl -fsSL https://claude.ai/install.sh | bash</code>
+              <div class="tip">Node.js 등 필요한 것은 자동으로 함께 설치됩니다.</div>
+            </div>
+            <div class="mcp-step">
+              <h5>첫 실행 및 로그인</h5>
+              <p>터미널에서 <b>claude</b> 입력 → 브라우저가 열리면 Claude 계정으로 로그인하세요.</p>
+              <code>claude</code>
+            </div>
+            <div class="mcp-step">
+              <h5>설치 확인</h5>
+              <code>claude --version</code>
+              <p style="margin-top:6px;">숫자(예: <b>2.1.x</b>)가 나오면 성공!</p>
+            </div>
+          </div>
+          <a class="guide-link" href="https://ariri48.github.io/shareclass-claude-code/guide.html?course=basic" target="_blank">
+            <span>교육 가이드 &gt; 준비 &gt; 1-A. Claude Code 설치</span>
+            <span class="arrow">&rarr;</span>
+          </a>
+        </div>
+      </div>
+
+      <div class="toggle-area">
+        <button class="btn-yes" onclick="setStatus(1, true)">YES, 설치됨</button>
+        <button class="btn-no" onclick="setStatus(1, false)">NO, 아직</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. Git -->
+  <div class="check-card" data-step="2">
+    <div class="card-header" onclick="toggleCard(this)">
+      <div class="step-number">2</div>
+      <div class="card-title-area">
+        <div class="card-title">Git 설치</div>
+        <div class="card-subtitle">코드 버전 관리 도구 (MCP 설치에 필요)</div>
+      </div>
+      <div class="status-badge" id="badge-2">확인 전</div>
+    </div>
+    <div class="card-body">
+      <div class="how-to-check">
+        <h4>확인 방법</h4>
+        <p style="font-size:13px; color:#555; margin-bottom:6px;">터미널에서 아래 명령어를 입력하세요.</p>
+        <code style="position:relative;">git --version<button class="copy-btn" onclick="copyCmd(this, 'git --version')">복사</button></code>
+        <div class="result"><b>git version 2.x.x</b> 같은 숫자가 나오면 설치 완료!</div>
+      </div>
+
+      <div class="install-guide">
+        <button class="install-toggle" onclick="toggleInstall(this)">
+          <span>아직 설치 안 했다면? 설치 방법 보기</span>
+          <span class="chevron">&#9660;</span>
+        </button>
+        <div class="install-content">
+          <div class="mcp-steps">
+            <div class="mcp-step">
+              <h5>Claude Code에게 맡기기</h5>
+              <p>Claude Code가 이미 설치되어 있다면, 대화창에 이렇게 말하면 끝!</p>
+              <code>Git 설치해줘</code>
+              <div class="tip">Claude Code가 OS에 맞는 설치 명령어를 알아서 실행합니다.</div>
+            </div>
+            <div class="mcp-step">
+              <h5>직접 설치하기 (Windows)</h5>
+              <p>PowerShell에서 아래를 입력하세요.</p>
+              <code>winget install --id Git.Git -e</code>
+              <p style="margin-top:8px;">설치 후 PowerShell을 <b>껐다가 다시 열어야</b> 명령어가 인식됩니다.</p>
+            </div>
+            <div class="mcp-step">
+              <h5>설치 확인</h5>
+              <code>git --version</code>
+              <p style="margin-top:6px;"><b>git version 2.x.x</b> 가 나오면 성공!</p>
+            </div>
+          </div>
+          <a class="guide-link" href="https://ariri48.github.io/shareclass-claude-code/guide.html?course=basic" target="_blank">
+            <span>교육 가이드 &gt; 준비 &gt; 1-E. Git 설치</span>
+            <span class="arrow">&rarr;</span>
+          </a>
+        </div>
+      </div>
+
+      <div class="toggle-area">
+        <button class="btn-yes" onclick="setStatus(2, true)">YES, 설치됨</button>
+        <button class="btn-no" onclick="setStatus(2, false)">NO, 아직</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. Python -->
+  <div class="check-card" data-step="3">
+    <div class="card-header" onclick="toggleCard(this)">
+      <div class="step-number">3</div>
+      <div class="card-title-area">
+        <div class="card-title">Python 설치</div>
+        <div class="card-subtitle">데이터 처리, 자동화 스크립트 실행에 필요</div>
+      </div>
+      <div class="status-badge" id="badge-3">확인 전</div>
+    </div>
+    <div class="card-body">
+      <div class="how-to-check">
+        <h4>확인 방법</h4>
+        <p style="font-size:13px; color:#555; margin-bottom:6px;">터미널에서 아래 명령어를 입력하세요.</p>
+        <code style="position:relative;">python --version<button class="copy-btn" onclick="copyCmd(this, 'python --version')">복사</button></code>
+        <div class="result"><b>Python 3.x.x</b> 같은 숫자가 나오면 설치 완료!</div>
+      </div>
+
+      <div class="install-guide">
+        <button class="install-toggle" onclick="toggleInstall(this)">
+          <span>아직 설치 안 했다면? 설치 방법 보기</span>
+          <span class="chevron">&#9660;</span>
+        </button>
+        <div class="install-content">
+          <div class="mcp-steps">
+            <div class="mcp-step">
+              <h5>Claude Code에게 맡기기</h5>
+              <p>Claude Code가 이미 설치되어 있다면, 대화창에 이렇게 말하면 끝!</p>
+              <code>Python 설치해줘</code>
+              <div class="tip">Claude Code가 OS에 맞는 설치 명령어를 알아서 실행합니다.</div>
+            </div>
+            <div class="mcp-step">
+              <h5>직접 설치하기 (Windows)</h5>
+              <p>PowerShell에서 아래를 입력하세요.</p>
+              <code>winget install --id Python.Python.3.13 -e</code>
+              <p style="margin-top:8px;">설치 후 PowerShell을 <b>껐다가 다시 열어야</b> 명령어가 인식됩니다.</p>
+            </div>
+            <div class="mcp-step">
+              <h5>설치 확인</h5>
+              <code>python --version</code>
+              <p style="margin-top:6px;"><b>Python 3.x.x</b> 가 나오면 성공!</p>
+            </div>
+          </div>
+          <a class="guide-link" href="https://ariri48.github.io/shareclass-claude-code/guide.html?course=basic" target="_blank">
+            <span>교육 가이드 &gt; 준비 &gt; 1-F. Python 설치</span>
+            <span class="arrow">&rarr;</span>
+          </a>
+        </div>
+      </div>
+
+      <div class="toggle-area">
+        <button class="btn-yes" onclick="setStatus(3, true)">YES, 설치됨</button>
+        <button class="btn-no" onclick="setStatus(3, false)">NO, 아직</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. Dooray MCP -->
+  <div class="check-card" data-step="4">
+    <div class="card-header" onclick="toggleCard(this)">
+      <div class="step-number">4</div>
+      <div class="card-title-area">
+        <div class="card-title">Dooray MCP 설치</div>
+        <div class="card-subtitle">Claude Code에서 Dooray를 쓸 수 있게 연결</div>
+      </div>
+      <div class="status-badge" id="badge-4">확인 전</div>
+    </div>
+    <div class="card-body">
+      <div class="how-to-check">
+        <h4>확인 방법</h4>
+        <p style="font-size:13px; color:#555; margin-bottom:6px;">Claude Code 안에서 <b>/mcp</b> 를 입력하세요.</p>
+        <code style="position:relative;">/mcp<button class="copy-btn" onclick="copyCmd(this, '/mcp')">복사</button></code>
+        <div class="result"><b>dooray-mcp</b> 가 <b style="color:#2e7d32;">connected</b> 로 나오면 설치 완료!</div>
+      </div>
+
+      <div class="install-guide">
+        <button class="install-toggle" onclick="toggleInstall(this)">
+          <span>아직 설치 안 했다면? 설치 방법 보기</span>
+          <span class="chevron">&#9660;</span>
+        </button>
+        <div class="install-content">
+          <div class="mcp-steps">
+            <div class="mcp-step">
+              <h5>소스 다운로드</h5>
+              <p>터미널에서 아래를 한 줄씩 입력하세요.</p>
+              <code>cd $HOME\Documents
+git clone https://github.com/ariri48/dooray-mcp.git
+cd dooray-mcp</code>
+            </div>
+
+            <div class="mcp-step">
+              <h5>설치 마법사 실행</h5>
+              <code>python setup.py</code>
+            </div>
+
+            <div class="mcp-step">
+              <h5>Dooray API 토큰 발급</h5>
+              <p>setup.py가 토큰을 물어보면, 두레이에서 발급받아 붙여넣기 하세요.</p>
+              <p style="font-weight:600; color:#191919;">발급 경로: 두레이 접속 &rarr; 좌측 하단 프로필 &rarr; 설정 &rarr; API 토큰 &rarr; 새 토큰 발급</p>
+              <div class="tip">토큰은 한 번만 보여줍니다. 복사해서 바로 붙여넣기 하세요.</div>
+            </div>
+
+            <div class="mcp-step">
+              <h5>연결 확인</h5>
+              <p>Claude Code를 <b>종료했다가 다시 실행</b>한 후, <b>/mcp</b> 를 입력하세요.</p>
+              <code>/mcp</code>
+              <p style="margin-top:8px;"><b>dooray-mcp</b>가 <b style="color:#2e7d32;">connected</b>로 나오면 성공!</p>
+            </div>
+          </div>
+          <a class="guide-link" href="https://ariri48.github.io/shareclass-claude-code/guide.html?course=basic" target="_blank">
+            <span>교육 가이드 &gt; 준비 &gt; 1-G. MCP 소개 + 소스 다운로드</span>
+            <span class="arrow">&rarr;</span>
+          </a>
+        </div>
+      </div>
+
+      <div class="toggle-area">
+        <button class="btn-yes" onclick="setStatus(4, true)">YES, connected 확인!</button>
+        <button class="btn-no" onclick="setStatus(4, false)">NO, 아직</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Completion + 사전 과제 -->
+  <div class="completion-banner" id="completionBanner">
+    <div class="emoji">&#127881;</div>
+    <h2>세팅 완료!</h2>
+    <p>이제 마지막 하나만 남았어요.</p>
+  </div>
+
+  <div class="assignment-card" id="assignmentCard">
+    <div class="assignment-header">
+      <span class="assignment-icon">&#128221;</span>
+      <h3>사전 과제: 자동화하고 싶은 내 업무 1건 가져오기</h3>
+    </div>
+    <div class="assignment-body">
+      <p class="assignment-lead">
+        평소에 "아, 이거 진짜 자동화하고 싶다..." 했던 반복 업무나 손이 많이 가는 업무를<br>
+        <strong>딱 하나만</strong> 골라 오세요!
+      </p>
+      <p class="assignment-sub">
+        매주 30분씩 귀찮게 만드는 작업도 좋고,<br>
+        한 달에 한 번이지만 할 때마다 스트레스인 작업도 모두 환영합니다.
+      </p>
+
+      <div class="example-box">
+        <h4>예를 들면 이런 업무들이에요</h4>
+        <ul>
+          <li>엑셀 데이터 정리하고 폰트/서식 맞추기</li>
+          <li>여러 파일 뒤져서 숫자 뽑고 보고서 만들기</li>
+          <li>Dooray 태스크 주기적으로 체크하고 정리하기</li>
+          <li>매번 복사&middot;붙여넣기 해서 같은 양식으로 메일 보내기</li>
+          <li>양쪽 데이터 비교해서 틀린 그림 찾기(대조 작업)</li>
+        </ul>
+      </div>
+
+      <div class="file-notice">
+        <strong>&#128204; 실제 활용할 파일이나 데이터를 함께 준비해 주세요!</strong>
+        <p>내 업무를 한결 편하게 만들 수 있는 기회이니, 즐거운 마음으로 고민해 봐 주세요.</p>
+      </div>
+
+      <div class="no-task-notice">
+        <p>
+          "딱히 그런 건 없고, 그냥 Claude Code 자동화가 뭔지 궁금했다" 하시는 분들은<br>
+          수업에서 <strong>샘플 과제를 제공</strong>하니 그걸로 함께 실습하셔도 됩니다. 이론적인 부분도 설명드려요.
+        </p>
+        <p class="small-warn">다만, 조금 수업이 아쉬우실 수 있어요! 참고해 주세요. :-)</p>
+      </div>
+
+      <div class="assignment-cta">내 업무를 내 걸로 만드는 시간, 만들어 봐요!</div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <p>NHN Cloud 파트너지원팀 | <a href="https://ariri48.github.io/shareclass-claude-code/guide.html?course=basic" target="_blank">전체 교육 가이드 보기</a></p>
+  </div>
+
+</div>
+
+<script>
+const state = { 1: null, 2: null, 3: null, 4: null };
+
+function toggleCard(header) {
+  const card = header.closest('.check-card');
+  card.classList.toggle('open');
+}
+
+function setStatus(step, isYes) {
+  state[step] = isYes;
+  const card = document.querySelector(`.check-card[data-step="${step}"]`);
+  const badge = document.getElementById(`badge-${step}`);
+  const yesBtn = card.querySelector('.btn-yes');
+  const noBtn = card.querySelector('.btn-no');
+
+  yesBtn.classList.toggle('active', isYes);
+  noBtn.classList.toggle('active', !isYes);
+
+  if (isYes) {
+    badge.textContent = 'YES';
+    badge.classList.add('yes');
+    card.classList.add('checked');
+  } else {
+    badge.textContent = 'NO';
+    badge.classList.remove('yes');
+    card.classList.remove('checked');
+  }
+
+  // Auto-open next unchecked card
+  if (isYes) {
+    card.classList.remove('open');
+    const nextStep = step + 1;
+    if (nextStep <= 4 && state[nextStep] === null) {
+      const nextCard = document.querySelector(`.check-card[data-step="${nextStep}"]`);
+      if (nextCard) {
+        nextCard.classList.add('open');
+        setTimeout(() => {
+          nextCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 200);
+      }
+    }
+  }
+
+  updateProgress();
+}
+
+function updateProgress() {
+  const done = Object.values(state).filter(v => v === true).length;
+  const total = 4;
+  document.getElementById('progressCount').textContent = `${done} / ${total}`;
+  document.getElementById('progressFill').style.width = `${(done / total) * 100}%`;
+
+  const msg = document.getElementById('progressMessage');
+  const banner = document.getElementById('completionBanner');
+  const assignment = document.getElementById('assignmentCard');
+
+  if (done === 0) {
+    msg.textContent = '아래 항목을 하나씩 확인해 보세요';
+    msg.classList.remove('done');
+  } else if (done < total) {
+    const remaining = total - done;
+    msg.textContent = `${remaining}개 남았습니다. 거의 다 왔어요!`;
+    msg.classList.remove('done');
+  } else {
+    msg.textContent = '모든 세팅 완료!';
+    msg.classList.add('done');
+    banner.classList.add('show');
+    assignment.classList.add('show');
+    return;
+  }
+  banner.classList.remove('show');
+  assignment.classList.remove('show');
+}
+
+function toggleInstall(btn) {
+  const guide = btn.closest('.install-guide');
+  guide.classList.toggle('open');
+}
+
+function copyCmd(btn, text) {
+  navigator.clipboard.writeText(text).then(() => {
+    const orig = btn.textContent;
+    btn.textContent = '완료!';
+    setTimeout(() => { btn.textContent = orig; }, 1200);
+  });
+}
+</script>
+</body>
+</html>
