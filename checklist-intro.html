@@ -299,7 +299,7 @@
   <div class="progress-section">
     <div class="progress-label">
       <span>진행률</span>
-      <span class="count" id="progressCount">0 / 15</span>
+      <span class="count" id="progressCount">0 / 14</span>
     </div>
     <div class="progress-bar">
       <div class="progress-fill" id="progressFill"></div>
@@ -524,22 +524,8 @@ cd dooray-mcp<button class="copy-btn" onclick="copyCmd(this,'cd $HOME\\Documents
     <div class="step" data-step="13">
       <div class="step-header" onclick="toggle(this)">
         <div class="step-num">13</div>
-        <div class="step-title">Dooray 태스크 조회</div>
-        <div class="check-icon" onclick="event.stopPropagation(); check(13)"></div>
-      </div>
-      <div class="step-body">
-        <div class="action">
-          <div class="where">Claude Code &gt; 프롬프트</div>
-          <code>내 두레이 태스크 보여줘<button class="copy-btn" onclick="copyCmd(this,'내 두레이 태스크 보여줘')">복사</button></code>
-        </div>
-      </div>
-    </div>
-
-    <div class="step" data-step="14">
-      <div class="step-header" onclick="toggle(this)">
-        <div class="step-num">14</div>
         <div class="step-title">Dooray 태스크 생성</div>
-        <div class="check-icon" onclick="event.stopPropagation(); check(14)"></div>
+        <div class="check-icon" onclick="event.stopPropagation(); check(13)"></div>
       </div>
       <div class="step-body">
         <div class="action">
@@ -549,11 +535,11 @@ cd dooray-mcp<button class="copy-btn" onclick="copyCmd(this,'cd $HOME\\Documents
       </div>
     </div>
 
-    <div class="step" data-step="15">
+    <div class="step" data-step="14">
       <div class="step-header" onclick="toggle(this)">
-        <div class="step-num">15</div>
+        <div class="step-num">14</div>
         <div class="step-title">대시보드 만들기</div>
-        <div class="check-icon" onclick="event.stopPropagation(); check(15)"></div>
+        <div class="check-icon" onclick="event.stopPropagation(); check(14)"></div>
       </div>
       <div class="step-body">
         <div class="action">
@@ -577,7 +563,7 @@ cd dooray-mcp<button class="copy-btn" onclick="copyCmd(this,'cd $HOME\\Documents
 </div>
 
 <script>
-const TOTAL = 15;
+const TOTAL = 14;
 const state = {};
 for (let i = 1; i <= TOTAL; i++) state[i] = false;
 
