@@ -375,6 +375,11 @@
           <code>Git 설치해줘<button class="copy-btn" onclick="copyCmd(this,'Git 설치해줘')">복사</button></code>
           <div class="result">Claude가 알아서 설치합니다</div>
         </div>
+        <div class="action">
+          <div class="where">설치 확인</div>
+          <code>git --version<button class="copy-btn" onclick="copyCmd(this,'git --version')">복사</button></code>
+          <div class="result"><b>git version 2.x.x</b> 나오면 성공</div>
+        </div>
       </div>
     </div>
 
@@ -389,6 +394,11 @@
           <div class="where">Claude Code &gt; 프롬프트</div>
           <code>Python 설치해줘<button class="copy-btn" onclick="copyCmd(this,'Python 설치해줘')">복사</button></code>
           <div class="result">Claude가 알아서 설치합니다</div>
+        </div>
+        <div class="action">
+          <div class="where">설치 확인</div>
+          <code>python --version<button class="copy-btn" onclick="copyCmd(this,'python --version')">복사</button></code>
+          <div class="result"><b>Python 3.x.x</b> 나오면 성공</div>
         </div>
       </div>
     </div>
@@ -458,6 +468,12 @@ cd dooray-mcp<button class="copy-btn" onclick="copyCmd(this,'cd $HOME\\Documents
   <!-- ========== 2. 실습 ========== -->
   <div class="section">
     <div class="section-title">Step 2. 실습</div>
+
+    <a class="guide-banner" href="https://ariri48.github.io/shareclass-claude-code/" target="_blank" style="margin: 0 0 12px;">
+      <span>📖</span>
+      <span>교육 메인 페이지 바로가기</span>
+      <span class="arrow">&rarr;</span>
+    </a>
 
     <div class="step" data-step="10">
       <div class="step-header" onclick="toggle(this)">
