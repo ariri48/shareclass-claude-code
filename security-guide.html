@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 서비스 이용 보안정책 가이드</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Pretendard',system-ui,-apple-system,sans-serif;background:#f8fafc;color:#1a1a1a;line-height:1.7}
+
+  /* Header */
+  .header{background:#191919;color:#fff;padding:48px 24px 40px;text-align:center}
+  .header-badge{display:inline-block;padding:4px 14px;border-radius:999px;font-size:12px;font-weight:700;background:rgba(239,68,68,.15);color:#fca5a5;margin-bottom:16px;letter-spacing:.03em}
+  .header h1{font-size:32px;font-weight:800;letter-spacing:-.02em;line-height:1.3}
+  .header p{font-size:14px;color:#94a3b8;margin-top:12px}
+
+  /* Container */
+  .container{max-width:760px;margin:0 auto;padding:32px 24px 80px}
+
+  /* Section */
+  .section{margin-bottom:32px}
+  .section-title{font-size:20px;font-weight:800;color:#0f172a;margin-bottom:16px;letter-spacing:-.01em;display:flex;align-items:center;gap:10px}
+  .section-title .icon{font-size:22px}
+  .section-desc{font-size:14px;color:#475569;margin-bottom:16px;line-height:1.7}
+
+  /* Cards */
+  .card{background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:24px;margin-bottom:16px}
+  .card-title{font-size:16px;font-weight:700;color:#1e293b;margin-bottom:12px}
+
+  /* Grade table */
+  .grade-table{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;overflow:hidden;border-radius:12px;border:1px solid #e2e8f0}
+  .grade-table th{background:#f1f5f9;color:#64748b;font-weight:700;padding:10px 14px;text-align:left;font-size:12px;text-transform:uppercase;letter-spacing:.03em}
+  .grade-table td{padding:10px 14px;border-top:1px solid #f1f5f9;vertical-align:top}
+  .grade-table tr:hover td{background:#f8fafc}
+  .grade-badge{display:inline-block;padding:2px 10px;border-radius:6px;font-size:11px;font-weight:700;min-width:60px;text-align:center}
+  .grade-red{background:#fef2f2;color:#dc2626}
+  .grade-orange{background:#fff7ed;color:#ea580c}
+  .grade-yellow{background:#fefce8;color:#ca8a04}
+  .grade-green{background:#f0fdf4;color:#16a34a}
+
+  /* List */
+  .item-list{list-style:none;padding:0}
+  .item-list li{padding:8px 0;font-size:14px;color:#334155;display:flex;align-items:flex-start;gap:10px;border-bottom:1px solid #f8fafc}
+  .item-list li:last-child{border-bottom:none}
+  .item-list li::before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:#cbd5e1;flex-shrink:0;margin-top:8px}
+
+  /* Alert boxes */
+  .alert{padding:16px 20px;border-radius:12px;font-size:13px;line-height:1.7;margin-bottom:12px;display:flex;align-items:flex-start;gap:10px}
+  .alert-icon{font-size:16px;flex-shrink:0;margin-top:1px}
+  .alert-safe{background:#f0fdf4;border:1px solid #bbf7d0;color:#166534}
+  .alert-warn{background:#fffbeb;border:1px solid #fde68a;color:#92400e}
+  .alert-danger{background:#fef2f2;border:1px solid #fecaca;color:#991b1b}
+
+  /* Simple table */
+  .simple-table{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;overflow:hidden;border-radius:12px;border:1px solid #e2e8f0}
+  .simple-table th{background:#f1f5f9;color:#64748b;font-weight:700;padding:10px 14px;text-align:left;font-size:12px}
+  .simple-table td{padding:10px 14px;border-top:1px solid #f1f5f9}
+  .simple-table tr:hover td{background:#f8fafc}
+
+  /* Code */
+  code{background:#f1f5f9;padding:2px 7px;border-radius:5px;font-size:12px;font-family:'Cascadia Code','D2Coding',monospace;color:#4f46e5}
+
+  /* Summary card */
+  .summary-card{background:linear-gradient(135deg,#0f172a,#1e293b);border-radius:16px;padding:28px;color:#fff}
+  .summary-card .s-title{font-size:18px;font-weight:800;margin-bottom:16px}
+  .summary-table{width:100%;border-collapse:collapse;font-size:13px}
+  .summary-table td{padding:8px 0;border-bottom:1px solid rgba(255,255,255,.08);color:#cbd5e1}
+  .summary-table tr:last-child td{border-bottom:none}
+  .summary-table .s-label{color:#fff;font-weight:600}
+  .s-ok{color:#4ade80;font-weight:700}
+  .s-no{color:#f87171;font-weight:700}
+  .s-check{color:#fbbf24;font-weight:700}
+
+  /* Back link */
+  .back-link{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:#64748b;text-decoration:none;margin-bottom:24px;padding:6px 14px;background:#fff;border:1px solid #e2e8f0;border-radius:10px;transition:all .15s}
+  .back-link:hover{background:#f1f5f9;color:#334155}
+
+  /* Numbered steps */
+  .step-list{list-style:none;padding:0;counter-reset:step}
+  .step-list li{counter-increment:step;padding:10px 0;font-size:14px;color:#334155;display:flex;align-items:flex-start;gap:12px}
+  .step-list li::before{content:counter(step);display:flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;background:#eef2ff;color:#4f46e5;font-size:12px;font-weight:700;flex-shrink:0;margin-top:1px}
+
+  @media(max-width:640px){
+    .header h1{font-size:24px}
+    .container{padding:20px 16px 60px}
+    .card{padding:20px 16px}
+    .grade-table{font-size:12px}
+    .grade-table th,.grade-table td{padding:8px 10px}
+  }
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+  <div class="header-badge">SECURITY POLICY</div>
+  <h1>AI 서비스 이용<br>보안정책 가이드</h1>
+  <p>NHN 사내 AI 서비스 활용 시 지켜야 할 보안 기준</p>
+</div>
+
+<div class="container">
+  <a href="index.html" class="back-link">← 교육 메인으로</a>
+
+  <!-- 적용 범위 -->
+  <div class="section">
+    <div class="alert alert-warn">
+      <span class="alert-icon">&#9888;&#65039;</span>
+      <div>사내에서 AI 서비스(ChatGPT, Claude, Gemini, Copilot 등)를 업무에 활용할 때 지켜야 할 보안 기준입니다. AI 서비스에 직접 입력하는 텍스트뿐 아니라, <strong>AI가 화면을 읽거나 파일을 참조하는 경우에도 동일하게 적용</strong>됩니다.</div>
+    </div>
+  </div>
+
+  <!-- 1. 개인정보 -->
+  <div class="section">
+    <div class="section-title"><span class="icon">&#128274;</span> AI 서비스에 입력하면 안 되는 정보</div>
+
+    <div class="card">
+      <div class="card-title">1. 개인정보</div>
+      <p class="section-desc">입력한 정보가 AI 학습에 활용되거나 외부 서버에 저장될 수 있으므로, 개인을 식별할 수 있는 정보는 입력하지 않습니다.</p>
+      <table class="grade-table">
+        <thead>
+          <tr><th>등급</th><th>설명</th><th>예시</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="grade-badge grade-red">RED</span></td>
+            <td>법령에 의해 암호화/보호가 의무인 정보</td>
+            <td>주민등록번호, 여권번호, 계좌번호, 카드번호, 비밀번호, 생체정보, 위치정보</td>
+          </tr>
+          <tr>
+            <td><span class="grade-badge grade-orange">ORANGE</span></td>
+            <td>개인을 직접 식별할 수 있는 연락처/민감정보</td>
+            <td>휴대폰번호, 이메일, 주소, 건강정보, 사상/정치견해, 범죄경력</td>
+          </tr>
+          <tr>
+            <td><span class="grade-badge grade-yellow">YELLOW</span></td>
+            <td>단독으로는 식별 어렵지만 조합하면 식별 가능</td>
+            <td>이름+아이디, 기기식별정보(UUID/IMEI), MAC주소, DI</td>
+          </tr>
+          <tr>
+            <td><span class="grade-badge grade-green">GREEN</span></td>
+            <td>단독 노출은 허용하나 조합 시 주의</td>
+            <td>이름, 아이디, CI, IP</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="alert alert-safe" style="margin-top:12px">
+        <span class="alert-icon">&#9989;</span>
+        <div>시스템 로그에 포함된 IP 등 개인 식별이 불가능한 정보는 개인정보에 해당하지 않습니다.</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">2. 영업비밀</div>
+      <p class="section-desc">외부 유출 시 회사에 손해를 끼칠 수 있는 기밀 자료는 입력하지 않습니다.</p>
+      <ul class="item-list">
+        <li>전략기획 자료</li>
+        <li>마케팅 전략/계획</li>
+        <li>연구개발 자료</li>
+        <li>미공개 재무 데이터</li>
+        <li>내부 의사결정 문서</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <div class="card-title">3. 크리덴셜 (인증정보)</div>
+      <p class="section-desc">시스템 접근에 사용되는 인증정보는 절대 입력하지 않습니다.</p>
+      <ul class="item-list">
+        <li>API 키, 토큰</li>
+        <li>SSH 키, PEM 파일</li>
+        <li>DB 비밀번호</li>
+        <li>서비스 계정 인증정보</li>
+        <li><code>.env</code> 파일 내용</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- 2. 브라우저 자동화 -->
+  <div class="section">
+    <div class="section-title"><span class="icon">&#127760;</span> 브라우저 자동화 도구 사용 시 추가 고려사항</div>
+    <p class="section-desc">Playwriter 같은 브라우저 자동화 도구는 로컬에서 동작하지만, AI가 화면을 읽는 과정에서 화면에 표시된 정보가 AI 대화에 포함됩니다.</p>
+
+    <div class="card">
+      <div class="alert alert-safe" style="margin-bottom:12px">
+        <span class="alert-icon">&#9989;</span>
+        <div>
+          <strong>안전한 경우</strong><br>
+          공개된 웹 페이지 탐색 / 민감정보가 없는 단순 폼 입력 자동화 / 로그인 후 구조/레이아웃만 확인하는 용도
+        </div>
+      </div>
+      <div class="alert alert-warn" style="margin-bottom:12px">
+        <span class="alert-icon">&#9888;&#65039;</span>
+        <div>
+          <strong>주의가 필요한 경우</strong><br>
+          사내 시스템(SSO 로그인 필요)에서 데이터를 읽는 경우 / 기안 시스템에서 금액/거래처 정보가 화면에 표시되는 경우 / 인사/급여/결재 시스템 등 민감정보가 포함된 화면 조작
+        </div>
+      </div>
+      <div style="margin-top:16px">
+        <div style="font-size:14px;font-weight:700;color:#1e293b;margin-bottom:8px">권장 절차</div>
+        <ol class="step-list">
+          <li>자동화 대상 화면에 위 금지 정보(개인정보/영업비밀/크리덴셜)가 포함되는지 확인</li>
+          <li>포함된다면 소속 부서 보안담당자 또는 정보보호팀에 사전 확인</li>
+          <li>민감정보가 화면에 노출되지 않도록 필터링하거나, 해당 단계만 수동 처리</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. 코드 보안 -->
+  <div class="section">
+    <div class="section-title"><span class="icon">&#128187;</span> 코드 작성 시 보안 기준</div>
+    <p class="section-desc">AI를 활용해 코드를 작성할 때도 보안 기준을 지켜야 합니다.</p>
+
+    <div class="card" style="padding:0;overflow:hidden">
+      <table class="simple-table">
+        <thead><tr><th>항목</th><th>규칙</th></tr></thead>
+        <tbody>
+          <tr><td style="font-weight:600;white-space:nowrap">API 키/비밀번호</td><td>코드에 직접 쓰지 않고 <code>.env</code> 파일 + 환경변수로 관리</td></tr>
+          <tr><td style="font-weight:600;white-space:nowrap">SQL 쿼리</td><td>문자열 직접 조합(f-string) 금지, 파라미터 바인딩(<code>?</code>) 사용</td></tr>
+          <tr><td style="font-weight:600;white-space:nowrap">위험 함수</td><td><code>eval()</code>, <code>exec()</code> 사용 금지</td></tr>
+          <tr><td style="font-weight:600;white-space:nowrap">파일 경로</td><td>사용자 입력을 경로에 직접 연결하지 않고, 상위 디렉토리 탈출 검증</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 4. GitHub -->
+  <div class="section">
+    <div class="section-title"><span class="icon">&#128230;</span> 외부 공개 저장소(GitHub Public) 주의사항</div>
+
+    <div class="card">
+      <ul class="item-list">
+        <li>PAT(Personal Access Token)를 코드/설정파일/메신저/메일에 평문으로 저장하거나 전송하지 않기</li>
+        <li>PAT 발급 시 만료 기한 90일 이내, 최소 권한 원칙 적용</li>
+        <li>사내 IP, 내부 URL, 인증정보가 포함된 파일 커밋 금지</li>
+        <li><code>.git/config</code>, <code>.gitconfig</code>에 토큰 노출 여부 점검</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- 요약 -->
+  <div class="section">
+    <div class="summary-card">
+      <div class="s-title">한눈에 보는 요약</div>
+      <table class="summary-table">
+        <tr><td class="s-label">공개된 기술 문서/매뉴얼 내용</td><td style="text-align:right"><span class="s-ok">O 입력 가능</span></td></tr>
+        <tr><td class="s-label">일반적인 업무 질문/코드 질문</td><td style="text-align:right"><span class="s-ok">O 입력 가능</span></td></tr>
+        <tr><td class="s-label">개인정보 (이름+연락처, 주민번호 등)</td><td style="text-align:right"><span class="s-no">X 입력 금지</span></td></tr>
+        <tr><td class="s-label">영업비밀 (전략/재무/미공개 자료)</td><td style="text-align:right"><span class="s-no">X 입력 금지</span></td></tr>
+        <tr><td class="s-label">인증정보 (API 키, 비밀번호, 토큰)</td><td style="text-align:right"><span class="s-no">X 입력 금지</span></td></tr>
+        <tr><td class="s-label">사내 시스템 화면 (민감정보 포함 시)</td><td style="text-align:right"><span class="s-check">사전 확인 필요</span></td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="alert alert-safe">
+    <span class="alert-icon">&#128172;</span>
+    <div>궁금한 점이 있으면 소속 부서 보안담당자 또는 정보보호팀에 문의해주세요.</div>
+  </div>
+
+</div>
+
+<!-- Footer -->
+<div style="max-width:760px;margin:0 auto;padding:0 24px 60px;">
+  <div style="border-top:1px solid #e2e8f0;padding-top:24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+    <div>
+      <div style="font-size:14px;font-weight:700;color:#334155;">NHN Cloud 파트너지원팀</div>
+      <div style="font-size:13px;color:#64748b;">정유경 전임</div>
+    </div>
+    <div style="font-size:12px;color:#94a3b8;">2026-07-30 업데이트</div>
+  </div>
+</div>
+
+</body>
+</html>
